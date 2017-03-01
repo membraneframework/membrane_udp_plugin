@@ -1,4 +1,4 @@
-defmodule Membrane.Element.UDPSocket do
+defmodule Membrane.Element.UDP do
   use Application
 
   def start(_type, _args) do
@@ -8,7 +8,7 @@ defmodule Membrane.Element.UDPSocket do
 
     ]
 
-    opts = [strategy: :one_for_one, name: Membrane.Element.UDPSocket]
+    opts = [strategy: :one_for_one, name: Membrane.Element.UDP]
     Supervisor.start_link(children, opts)
   end
 end

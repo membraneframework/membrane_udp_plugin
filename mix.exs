@@ -1,16 +1,16 @@
-defmodule Membrane.Element.UDPSocket.Mixfile do
+defmodule Membrane.Element.UDP.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :membrane_element_udpsocket,
+    [app: :membrane_element_udp,
      version: "0.0.1",
      elixir: "~> 1.3",
      elixirc_paths: elixirc_paths(Mix.env),
-     description: "Membrane Multimedia Framework (UDPSocket Element)",
+     description: "Membrane Multimedia Framework (UDP Element)",
      maintainers: ["Mateusz Nowak"],
      licenses: ["LGPL"],
-     name: "Membrane Element: UDPSocket",
-     source_url: "https://github.com/membraneframework/membrane-element-udpsocket",
+     name: "Membrane Element: UDP",
+     source_url: "https://github.com/membraneframework/membrane-element-udp",
      preferred_cli_env: [espec: :test],
      deps: deps]
   end
@@ -19,7 +19,7 @@ defmodule Membrane.Element.UDPSocket.Mixfile do
   def application do
     [applications: [
       :membrane_core
-    ], mod: {Membrane.Element.UDPSocket, []}]
+    ], mod: {Membrane.Element.UDP, []}]
   end
 
 

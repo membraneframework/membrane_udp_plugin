@@ -1,6 +1,6 @@
-defmodule Membrane.Element.UDPSocket.Socket do
+defmodule Membrane.Element.UDP.Socket do
   use Membrane.Element.Base.Filter
-  alias Membrane.Element.UDPSocket.SocketOptions
+  alias Membrane.Element.UDP.SocketOptions
   
   def_known_source_pads %{
     :sink => {:always, [:any]}
