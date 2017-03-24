@@ -1,4 +1,19 @@
 defmodule Membrane.Element.UDP.Socket do
+  @moduledoc """
+  Element that can be used to read from and write to UDP sockets.
+
+  It will bind to local address:port specified as `:local_address` and `:local_port`
+  fields of the `Membrane.Element.UDP.SocketOptions` struct and just send all
+  received buffers to the source pad.
+
+  It will also send all received buffers on the sink pad to destination specified
+  as `:remote_address` and `:remote_port` in the
+  `Membrane.Element.UDP.SocketOptions` struct.
+
+  If remote peer is not specified in `Membrane.Element.UDP.SocketOptions` struct,
+  it will remember address and port of the first received packet.
+    """
+
   use Membrane.Element.Base.Filter
   alias Membrane.Element.UDP.SocketOptions
   alias Membrane.Buffer.Metadata
@@ -20,8 +35,8 @@ defmodule Membrane.Element.UDP.Socket do
 
 
   @doc false
-  def handle_prepare(_prev_state, %{port: port, tos: tos} = state) do
-    {:ok, socket} = :gen_udp.open(port, [{:tos, tos}, :binary])
+  def handle_prepare(_prev_state, %{local_port: port, local_address: address, tos: tos} = state) do
+    {:ok, socket} = :gen_udp.open(port, [{:ip, address}, {:tos, tos}, :binary])
     :gen_udp.controlling_process(socket, self())
     {:ok, %{state | socket: socket}}
   end
