@@ -35,10 +35,17 @@ defmodule Membrane.Element.UDP.Socket do
 
 
   @doc false
-  def handle_prepare(_prev_state, %{local_port: port, local_address: address, tos: tos} = state) do
+  def handle_prepare(:stopped, %{local_port: port, local_address: address, tos: tos} = state) do
     {:ok, socket} = :gen_udp.open(port, [{:ip, address}, {:tos, tos}, :binary])
     :gen_udp.controlling_process(socket, self())
     {:ok, %{state | socket: socket}}
+  end
+
+
+  @doc false
+  def handle_prepare(:playing, %{socket: socket} = state) do
+    :ok = :gen_udp.close(socket)
+    {:ok, %{state | socket: nil}}
   end
 
 

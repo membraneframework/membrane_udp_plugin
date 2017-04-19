@@ -12,7 +12,7 @@ defmodule Membrane.Element.UDP.Mixfile do
      name: "Membrane Element: UDP",
      source_url: "https://github.com/membraneframework/membrane-element-udp",
      preferred_cli_env: [espec: :test],
-     deps: deps]
+     deps: deps()]
   end
 
 
