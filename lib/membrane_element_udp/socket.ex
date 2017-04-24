@@ -63,17 +63,10 @@ defmodule Membrane.Element.UDP.Socket do
   @doc false
   def handle_other(message, %{remote_port: remote_port, remote_address: remote_address} = state) do
 
-    state = case {remote_address, remote_port} do
-
-      {nil, nil} ->
-        case message do
-          {:udp, _port, udp_source_address, udp_source_port, _data} ->
-            %{state | remote_address: udp_source_address, remote_port: udp_source_port}
-          _ -> state
-        end
-
-      _ ->
-        state
+    state = case message do
+      {:udp, _port, udp_source_address, udp_source_port, _data} ->
+        %{state | remote_address: udp_source_address, remote_port: udp_source_port}
+      _ -> state
     end
 
 
