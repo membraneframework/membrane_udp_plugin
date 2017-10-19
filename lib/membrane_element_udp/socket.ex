@@ -51,17 +51,22 @@ defmodule Membrane.Element.UDP.Socket do
 
   @doc false
   def handle_buffer(:sink, _caps, %Membrane.Buffer{payload: data}, %{socket: socket, remote_address: remote_address, remote_port: remote_port} = state) do
+    if is_nil(remote_port) or is_nil(remote_address) do
+      warn("Could not send udp packet. Remote port or address not specified")
+      {:ok, state}
+    else
       case :gen_udp.send(socket, remote_address, remote_port, data) do
         :ok ->
           {:ok, state}
         {:error, reason} ->
           {:error, reason, state}
       end
+    end
   end
 
 
   @doc false
-  def handle_other(message, %{remote_port: remote_port, remote_address: remote_address} = state) do
+  def handle_other(message, state) do
 
     state = case message do
       {:udp, _port, udp_source_address, udp_source_port, _data} ->
