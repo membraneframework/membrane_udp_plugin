@@ -1,31 +1,59 @@
 defmodule Membrane.Element.UDP.MixProject do
   use Mix.Project
 
+  @version "0.2.0"
+  @github_url "https://github.com/membraneframework/membrane-element-udp"
+
   def project do
     [
       app: :membrane_element_udp,
-      version: "0.1.0",
+      compilers: Mix.compilers(),
+      version: @version,
       elixir: "~> 1.7",
-      start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      description: "Membrane Multimedia Framework (UDP Element)",
+      package: package(),
+      name: "Membrane Element: UDP",
+      source_url: @github_url,
+      docs: docs(),
+      preferred_cli_env: [format: :test],
       deps: deps()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: []
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
+  defp elixirc_paths(:test), do: ["lib", "spec/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md"],
+      source_ref: "v#{@version}"
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Membrane Team"],
+      licenses: ["Apache 2.0"],
+      links: %{
+        "GitHub" => @github_url,
+        "Membrane Framework Homepage" => "https://membraneframework.org"
+      }
+    ]
+  end
+
   defp deps do
     [
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
-      {:membrane_core, "~> 0.1"},
+      {:membrane_core, "~> 0.2"},
       {:mockery, "~> 2.1", runtime: false}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
     ]
   end
 end

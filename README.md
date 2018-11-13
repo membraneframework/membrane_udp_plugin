@@ -1,21 +1,19 @@
-# Membrane.Element.UDP
+# Membrane Multimedia Framework: UDP Element
 
-**TODO: Add description**
+This package provides elements that can be used to read from and write to UDP sockets.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `membrane_element_udp` to your list of dependencies in `mix.exs`:
+Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-def deps do
-  [
-    {:membrane_element_udp, "~> 0.1.0"}
-  ]
-end
+{:membrane_element_mpegaudioparse, "~> 0.2"}
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/membrane_element_udp](https://hexdocs.pm/membrane_element_udp).
+## Copyright and License
 
+Copyright 2018, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane)
+
+[![Software Mansion](https://membraneframework.github.io/static/logo/swm_logo_readme.png)](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane)
+
+Licensed under the [Apache License, Version 2.0](LICENSE)

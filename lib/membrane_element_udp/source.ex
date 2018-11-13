@@ -1,7 +1,6 @@
 defmodule Membrane.Element.UDP.Source do
   use Membrane.Element.Base.Source
-  alias Membrane.{Buffer, Event}
-  use Membrane.Helper
+  alias Membrane.{Buffer}
 
   @f Mockery.of(Membrane.Element.UDP.CommonPort)
 
@@ -15,7 +14,11 @@ defmodule Membrane.Element.UDP.Source do
     ]
   )
 
-  def_known_source_pads(source: {:always, :pull, :any})
+  def_output_pads(
+    output: [
+      caps: :any
+    ]
+  )
 
   # Private API
 
@@ -31,26 +34,26 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
-  def handle_prepare(:stopped, %{
+  def handle_stopped_to_prepared(_ctx, %{
         address: address,
         port: port
       }),
       do: @f.open(address, port)
 
-  def handle_prepare(_, state), do: {:ok, state}
-
   @impl true
-  def handle_demand1(_pad, _context, state),
-    do: {:ok, state}
-
-  @impl true
-  def handle_demand(pad, size, :buffers, context, state) do
+  def handle_demand(_pad, _size, _, _ctx, state) do
     {:ok, state}
   end
 
   @impl true
-  def handle_other({:udp, _port, _address, _, payload}, state) do
-    actions = [buffer: {:source, %Buffer{payload: payload}}]
+
+  def handle_other({:udp, port, address, _, payload}, _, state) do
+    metadata =
+      Map.new()
+      |> Map.put(:udp_source_address, address)
+      |> Map.put(:udp_source_port, port)
+
+    actions = [buffer: {:output, %Buffer{payload: payload, metadata: metadata}}]
 
     {
       {:ok, actions},
@@ -59,5 +62,10 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
-  def handle_stop(state), do: @f.close(state)
+  def handle_prepared_to_stopped(_ctx, state) do
+    case @f.close(state.open_port) do
+      :ok -> {:ok, state}
+      {:error, cause} -> {:error, cause}
+    end
+  end
 end
