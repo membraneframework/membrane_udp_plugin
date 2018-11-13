@@ -1,10 +1,10 @@
-defmodule Membrane.Element.UDP.Source do
+defmodule Membrane.Element.UDP.Sink do
   @moduledoc """
   Element that reads packets from UDP socket and sends their payload through output pad.
 
   See `options/0` for available options
   """
-  use Membrane.Element.Base.Source
+  use Membrane.Element.Base.Sink
   alias Membrane.{Buffer}
 
   @f Mockery.of(Membrane.Element.UDP.CommonPort)
@@ -19,8 +19,8 @@ defmodule Membrane.Element.UDP.Source do
     ]
   )
 
-  def_output_pads(
-    output: [
+  def_input_pads(
+    input: [
       caps: :any
     ]
   )
@@ -38,32 +38,20 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
+  def handle_write(:input, %Buffer{payload: payload}, _ctx, %{
+        address: target_address,
+        port: target_port,
+        open_port: port
+      }) do
+    @f.send(port, payload, target_address, target_port)
+  end
+
+  @impl true
   def handle_stopped_to_prepared(_ctx, %{
         address: address,
         port: port
       }),
       do: @f.open(address, port)
-
-  @impl true
-  def handle_demand(_pad, _size, _, _ctx, state) do
-    {:ok, state}
-  end
-
-  @impl true
-
-  def handle_other({:udp, port, address, _, payload}, _, state) do
-    metadata =
-      Map.new()
-      |> Map.put(:udp_source_address, address)
-      |> Map.put(:udp_source_port, port)
-
-    actions = [buffer: {:output, %Buffer{payload: payload, metadata: metadata}}]
-
-    {
-      {:ok, actions},
-      state
-    }
-  end
 
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
