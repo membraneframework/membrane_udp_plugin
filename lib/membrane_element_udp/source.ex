@@ -51,7 +51,7 @@ defmodule Membrane.Element.UDP.Source do
 
   @impl true
 
-  def handle_other({:udp, port, address, _, payload}, _, state) do
+  def handle_other({:udp, _, address, port, payload}, _, state) do
     metadata =
       Map.new()
       |> Map.put(:udp_source_address, address)

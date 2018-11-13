@@ -6,52 +6,58 @@ defmodule Membrane.Element.UDP.Sink do
   """
   use Membrane.Element.Base.Sink
   alias Membrane.{Buffer}
-
-  @f Mockery.of(Membrane.Element.UDP.CommonPort)
+  import Mockery.Macro
 
   def_options(
-    address: [type: :string, description: "IP Address"],
-    port: [
+    destination_address: [type: :string, description: "IP Address that packets will be sent to"],
+    destination_port: [
+      type: :integer,
+      spec: pos_integer,
+      description: "UDP target port"
+    ],
+    local_address: [type: :string, description: "Local IP Address"],
+    local_port: [
       type: :integer,
       spec: pos_integer,
       default: 5000,
-      description: "UDP target port"
+      description: "UDP local port"
     ]
   )
 
   def_input_pads(
     input: [
-      caps: :any
+      caps: :any,
+      demand_unit: :buffers
     ]
   )
 
   # Private API
 
   @impl true
-  def handle_init(%__MODULE__{address: address, port: port}) do
-    {:ok,
-     %{
-       address: address,
-       port: port,
-       open_port: nil
-     }}
+  def handle_init(%__MODULE__{} = options) do
+    {:ok, Map.from_struct(options)}
   end
 
   @impl true
   def handle_write(:input, %Buffer{payload: payload}, _ctx, %{
-        address: target_address,
-        port: target_port,
+        destination_address: destination_address,
+        destination_port: destination_port,
         open_port: port
       }) do
-    @f.send(port, payload, target_address, target_port)
+    mockable(Membrane.Element.UDP.CommonPort).send(
+      port,
+      payload,
+      destination_address,
+      destination_port
+    )
   end
 
   @impl true
   def handle_stopped_to_prepared(_ctx, %{
-        address: address,
-        port: port
+        local_address: address,
+        local_port: port
       }),
-      do: @f.open(address, port)
+      do: mockable(Membrane.Element.UDP.CommonPort).open(address, port)
 
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
