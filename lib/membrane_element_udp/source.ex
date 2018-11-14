@@ -6,8 +6,7 @@ defmodule Membrane.Element.UDP.Source do
   """
   use Membrane.Element.Base.Source
   alias Membrane.{Buffer}
-
-  @f Mockery.of(Membrane.Element.UDP.CommonPort)
+  import Mockery.Macro
 
   def_options(
     address: [type: :string, description: "IP Address"],
@@ -38,11 +37,14 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
-  def handle_stopped_to_prepared(_ctx, %{
-        address: address,
-        port: port
-      }),
-      do: @f.open(address, port)
+  def handle_stopped_to_prepared(
+        _ctx,
+        %{
+          address: address,
+          port: port
+        } = state
+      ),
+      do: mockable(Membrane.Element.UDP.CommonPort).open(address, port, state)
 
   @impl true
   def handle_demand(_pad, _size, _, _ctx, state) do
@@ -67,9 +69,7 @@ defmodule Membrane.Element.UDP.Source do
 
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
-    case @f.close(state.open_port) do
-      :ok -> {:ok, state}
-      {:error, cause} -> {:error, cause}
-    end
+    mockable(Membrane.Element.UDP.CommonPort).close(state.open_port)
+    {:ok, state}
   end
 end

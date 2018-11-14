@@ -39,31 +39,43 @@ defmodule Membrane.Element.UDP.Sink do
   end
 
   @impl true
-  def handle_write(:input, %Buffer{payload: payload}, _ctx, %{
-        destination_address: destination_address,
-        destination_port: destination_port,
-        open_port: port
-      }) do
-    mockable(Membrane.Element.UDP.CommonPort).send(
-      port,
-      payload,
-      destination_address,
-      destination_port
-    )
+  def handle_write(
+        :input,
+        %Buffer{payload: payload},
+        _ctx,
+        %{
+          destination_address: destination_address,
+          destination_port: destination_port,
+          open_port: port
+        } = state
+      ) do
+    case mockable(Membrane.Element.UDP.CommonPort).send(
+           port,
+           payload,
+           destination_address,
+           destination_port
+         ) do
+      :ok ->
+        {:ok, state}
+
+      {:error, _reason} = result ->
+        {result, state}
+    end
   end
 
   @impl true
-  def handle_stopped_to_prepared(_ctx, %{
-        local_address: address,
-        local_port: port
-      }),
-      do: mockable(Membrane.Element.UDP.CommonPort).open(address, port)
+  def handle_stopped_to_prepared(
+        _ctx,
+        %{
+          local_address: address,
+          local_port: port
+        } = state
+      ),
+      do: mockable(Membrane.Element.UDP.CommonPort).open(address, port, state)
 
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
-    case @f.close(state.open_port) do
-      :ok -> {:ok, state}
-      {:error, cause} -> {:error, cause}
-    end
+    mockable(Membrane.Element.UDP.CommonPort).close(state.open_port)
+    {:ok, state}
   end
 end
