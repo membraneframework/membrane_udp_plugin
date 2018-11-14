@@ -1,4 +1,6 @@
 defmodule Membrane.Element.UDP.CommonPort do
+  @moduledoc false
+
   @spec open(String.t(), non_neg_integer(), map()) ::
           {:ok, :gen_udp.socket()} | {{:error, {:open, :inet.posix()}}, map()}
   def open(address, port, state) do
