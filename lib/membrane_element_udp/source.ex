@@ -8,21 +8,17 @@ defmodule Membrane.Element.UDP.Source do
   alias Membrane.{Buffer}
   import Mockery.Macro
 
-  def_options(
-    address: [type: :string, description: "IP Address"],
-    port: [
-      type: :integer,
-      spec: pos_integer,
-      default: 5000,
-      description: "UDP target port"
-    ]
-  )
+  def_options address: [type: :string, description: "IP Address"],
+              port: [
+                type: :integer,
+                spec: pos_integer,
+                default: 5000,
+                description: "UDP target port"
+              ]
 
-  def_output_pads(
-    output: [
-      caps: :any
-    ]
-  )
+  def_output_pads output: [
+                    caps: :any
+                  ]
 
   # Private API
 
@@ -32,7 +28,7 @@ defmodule Membrane.Element.UDP.Source do
      %{
        address: address,
        port: port,
-       open_port: nil
+       socket_handle: nil
      }}
   end
 
@@ -69,7 +65,7 @@ defmodule Membrane.Element.UDP.Source do
 
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
-    mockable(Membrane.Element.UDP.CommonPort).close(state.open_port)
+    mockable(Membrane.Element.UDP.CommonPort).close(state.socket_handle)
     {:ok, state}
   end
 end

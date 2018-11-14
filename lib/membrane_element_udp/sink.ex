@@ -8,28 +8,27 @@ defmodule Membrane.Element.UDP.Sink do
   alias Membrane.{Buffer}
   import Mockery.Macro
 
-  def_options(
-    destination_address: [type: :string, description: "IP Address that packets will be sent to"],
-    destination_port: [
-      type: :integer,
-      spec: pos_integer,
-      description: "UDP target port"
-    ],
-    local_address: [type: :string, description: "Local IP Address"],
-    local_port: [
-      type: :integer,
-      spec: pos_integer,
-      default: 5000,
-      description: "UDP local port"
-    ]
-  )
+  def_options destination_address: [
+                type: :string,
+                description: "IP Address that packets will be sent to"
+              ],
+              destination_port: [
+                type: :integer,
+                spec: pos_integer,
+                description: "UDP target port"
+              ],
+              local_address: [type: :string, description: "Local IP Address"],
+              local_port: [
+                type: :integer,
+                spec: pos_integer,
+                default: 5000,
+                description: "UDP local port"
+              ]
 
-  def_input_pads(
-    input: [
-      caps: :any,
-      demand_unit: :buffers
-    ]
-  )
+  def_input_pads input: [
+                   caps: :any,
+                   demand_unit: :buffers
+                 ]
 
   # Private API
 
@@ -46,7 +45,7 @@ defmodule Membrane.Element.UDP.Sink do
         %{
           destination_address: destination_address,
           destination_port: destination_port,
-          open_port: port
+          socket_handle: port
         } = state
       ) do
     case mockable(Membrane.Element.UDP.CommonPort).send(
@@ -75,7 +74,7 @@ defmodule Membrane.Element.UDP.Sink do
 
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
-    mockable(Membrane.Element.UDP.CommonPort).close(state.open_port)
+    mockable(Membrane.Element.UDP.CommonPort).close(state.socket_handle)
     {:ok, state}
   end
 end

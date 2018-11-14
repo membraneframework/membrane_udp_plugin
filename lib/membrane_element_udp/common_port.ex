@@ -3,7 +3,7 @@ defmodule Membrane.Element.UDP.CommonPort do
           {:ok, :gen_udp.socket()} | {{:error, {:open, :inet.posix()}}, map()}
   def open(address, port, state) do
     case :gen_udp.open(port, [{:ip, address}, :binary, {:active, true}]) do
-      {:ok, port} -> {:ok, %{state | open_port: port}}
+      {:ok, port} -> {:ok, %{state | socket_handle: port}}
       {:error, reason} -> {{:error, {:open, reason}}, state}
     end
   end

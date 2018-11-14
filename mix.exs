@@ -16,7 +16,6 @@ defmodule Membrane.Element.UDP.MixProject do
       name: "Membrane Element: UDP",
       source_url: @github_url,
       docs: docs(),
-      preferred_cli_env: [format: :test],
       deps: deps()
     ]
   end
@@ -51,7 +50,7 @@ defmodule Membrane.Element.UDP.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:membrane_core, "~> 0.2"},
       {:mockery, "~> 2.1", runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
