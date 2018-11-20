@@ -10,14 +10,18 @@ defmodule Membrane.Element.UDP.CommonPort do
     end
   end
 
-  @spec close(port()) :: :ok
-  def close(port) when is_port(port) do
-    :gen_udp.close(port)
+  @spec close(state :: map()) :: :ok
+  def close(%{socket_handle: socket_handle}) when is_port(socket_handle) do
+    :gen_udp.close(socket_handle)
   end
 
-  @spec send(:gen_udp.socket(), any(), :inet.socket_address(), non_neg_integer) ::
-          :ok | {:error, :not_owner | :inet.posix()}
-  def send(port, data, target_ip, target_port) do
-    :gen_udp.send(port, target_ip, target_port, data)
+  @spec send(
+          :gen_udp.socket(),
+          iodata(),
+          :inet.socket_address(),
+          target_port_no :: non_neg_integer
+        ) :: :ok | {:error, :not_owner | :inet.posix()}
+  def send(port, data, target_ip, target_port_no) do
+    :gen_udp.send(port, target_ip, target_port_no, data)
   end
 end

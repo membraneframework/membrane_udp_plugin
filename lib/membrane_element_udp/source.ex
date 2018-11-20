@@ -17,7 +17,8 @@ defmodule Membrane.Element.UDP.Source do
               ]
 
   def_output_pads output: [
-                    caps: :any
+                    caps: :any,
+                    mode: :push
                   ]
 
   # Private API
@@ -65,7 +66,7 @@ defmodule Membrane.Element.UDP.Source do
 
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
-    mockable(Membrane.Element.UDP.CommonPort).close(state.socket_handle)
+    mockable(Membrane.Element.UDP.CommonPort).close(state)
     {:ok, state}
   end
 end
