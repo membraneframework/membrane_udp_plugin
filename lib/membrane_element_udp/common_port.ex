@@ -11,8 +11,9 @@ defmodule Membrane.Element.UDP.CommonPort do
   end
 
   @spec close(state :: map()) :: :ok
-  def close(%{socket_handle: socket_handle}) when is_port(socket_handle) do
+  def close(%{socket_handle: socket_handle} = state) when is_port(socket_handle) do
     :gen_udp.close(socket_handle)
+    %{state | socket_handle: nil}
   end
 
   @spec send(

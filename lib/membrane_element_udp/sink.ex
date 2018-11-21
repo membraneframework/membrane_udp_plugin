@@ -35,7 +35,17 @@ defmodule Membrane.Element.UDP.Sink do
 
   @impl true
   def handle_init(%__MODULE__{} = options) do
-    {:ok, Map.from_struct(options)}
+    state =
+      options
+      |> Map.from_struct()
+      |> Map.put(:socket_handle, nil)
+
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_prepared_to_playing(_ctx, state) do
+    {{:ok, demand: :input}, state}
   end
 
   @impl true
@@ -56,7 +66,7 @@ defmodule Membrane.Element.UDP.Sink do
            destination_port_no
          ) do
       :ok ->
-        {:ok, state}
+        {{:ok, demand: :input}, state}
 
       {:error, _reason} = result ->
         {result, state}

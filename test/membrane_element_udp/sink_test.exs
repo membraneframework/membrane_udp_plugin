@@ -9,16 +9,17 @@ defmodule Membrane.Element.UDP.SinkTest do
   @local_address {127, 0, 0, 1}
 
   def state(_ctx) do
-    {:ok, socket_handle} = CommonPort.open(@local_address, 5000)
+    {:ok, state} =
+      CommonPort.open(@local_address, 5000, %{
+        destination_address: @local_address,
+        destination_port_no: 5001,
+        local_address: @local_address,
+        local_port_no: 5000,
+        socket_handle: nil
+      })
 
     %{
-      state: %{
-        destination_address: @local_address,
-        destination_port: 5001,
-        local_address: @local_address,
-        local_port: 5000,
-        socket_handle: socket_handle
-      }
+      state: state
     }
   end
 
@@ -28,16 +29,18 @@ defmodule Membrane.Element.UDP.SinkTest do
     state:
       %{
         destination_address: destination_address,
-        destination_port: destination_port,
-        socket_handle: port
+        destination_port_no: destination_port
       } = state
   } do
     payload = "A lot of laughs"
-    {:ok, receving_socket} = CommonPort.open(destination_address, destination_port)
+
+    {:ok, receving_socket} =
+      :gen_udp.open(destination_port, [{:ip, destination_address}, :binary, {:active, true}])
+
     Sink.handle_write(:input, %Buffer{payload: payload}, nil, state)
 
     assert_receive {:udp, _, {127, 0, 0, 1}, 5000, ^payload}
-    CommonPort.close(receving_socket)
-    CommonPort.close(port)
+    :gen_udp.close(receving_socket)
+    CommonPort.close(state)
   end
 end

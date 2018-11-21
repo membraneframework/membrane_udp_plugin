@@ -5,7 +5,8 @@ defmodule Membrane.Element.UDP.Source do
   See `options/0` for available options
   """
   use Membrane.Element.Base.Source
-  alias Membrane.{Buffer}
+  alias Membrane.Buffer
+  alias Membrane.Element.UDP.CommonPort
   import Mockery.Macro
 
   def_options address: [type: :string, description: "IP Address"],
@@ -41,7 +42,7 @@ defmodule Membrane.Element.UDP.Source do
           port: port
         } = state
       ),
-      do: mockable(Membrane.Element.UDP.CommonPort).open(address, port, state)
+      do: mockable(CommonPort).open(address, port, state)
 
   @impl true
   def handle_demand(_pad, _size, _, _ctx, state) do
@@ -66,7 +67,7 @@ defmodule Membrane.Element.UDP.Source do
 
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
-    mockable(Membrane.Element.UDP.CommonPort).close(state)
+    mockable(CommonPort).close(state)
     {:ok, state}
   end
 end

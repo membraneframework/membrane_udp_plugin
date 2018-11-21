@@ -4,7 +4,7 @@ defmodule Membrane.Element.UDP.CommonPortTest do
   alias Membrane.Element.UDP.CommonPort
 
   test "opens port when not taken and closes" do
-    assert {:ok, port} = CommonPort.open({127, 0, 0, 1}, 5000)
-    assert :ok = CommonPort.close(port)
+    assert {:ok, state} = CommonPort.open({127, 0, 0, 1}, 5000, %{socket_handle: nil})
+    assert %{socket_handle: nil} = CommonPort.close(state)
   end
 end
