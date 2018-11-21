@@ -12,8 +12,8 @@ defmodule SourcePipeline do
       }) do
     elements = [
       udp_source: %Element.UDP.Source{
-        address: @local_address,
-        port_no: port_no
+        local_address: @local_address,
+        local_port_no: port_no
       },
       test_sink: %Element.TestSink{test_process: pid, name: :udp_source}
     ]

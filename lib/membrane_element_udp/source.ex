@@ -9,8 +9,8 @@ defmodule Membrane.Element.UDP.Source do
   alias Membrane.Element.UDP.CommonPort
   import Mockery.Macro
 
-  def_options address: [type: :string, description: "IP Address"],
-              port_no: [
+  def_options local_address: [type: :string, description: "IP Address"],
+              local_port_no: [
                 type: :integer,
                 spec: pos_integer,
                 default: 5000,
@@ -25,11 +25,11 @@ defmodule Membrane.Element.UDP.Source do
   # Private API
 
   @impl true
-  def handle_init(%__MODULE__{address: address, port_no: port_no}) do
+  def handle_init(%__MODULE__{local_address: address, local_port_no: port_no}) do
     {:ok,
      %{
-       address: address,
-       port_no: port_no,
+       local_address: address,
+       local_port_no: port_no,
        socket_handle: nil
      }}
   end
@@ -38,11 +38,11 @@ defmodule Membrane.Element.UDP.Source do
   def handle_stopped_to_prepared(
         _ctx,
         %{
-          address: address,
-          port_no: port_no
+          local_address: address,
+          local_port_no: port_no
         } = state
       ),
-      do: mockable(CommonPort).open(address, port_no, state)
+      do: mockable(CommonPort).open(state)
 
   @impl true
   def handle_demand(_pad, _size, _, _ctx, state) do

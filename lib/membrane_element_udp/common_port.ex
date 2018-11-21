@@ -1,10 +1,14 @@
 defmodule Membrane.Element.UDP.CommonPort do
   @moduledoc false
 
-  @spec open(String.t(), non_neg_integer(), map()) ::
-          {:ok, :gen_udp.socket()} | {{:error, {:open, :inet.posix()}}, map()}
-  def open(address, port, state) do
-    case :gen_udp.open(port, [{:ip, address}, :binary, {:active, true}]) do
+  @spec open(map()) :: {:ok, :gen_udp.socket()} | {{:error, {:open, :inet.posix()}}, map()}
+  def open(
+        %{
+          local_address: address,
+          local_port_no: port_no
+        } = state
+      ) do
+    case :gen_udp.open(port_no, [{:ip, address}, :binary, {:active, true}]) do
       {:ok, port} -> {:ok, %{state | socket_handle: port}}
       {:error, reason} -> {{:error, {:open, reason}}, state}
     end
@@ -17,12 +21,23 @@ defmodule Membrane.Element.UDP.CommonPort do
   end
 
   @spec send(
-          :gen_udp.socket(),
           iodata(),
-          :inet.socket_address(),
-          target_port_no :: non_neg_integer
+          map()
         ) :: :ok | {:error, :not_owner | :inet.posix()}
-  def send(port, data, target_ip, target_port_no) do
-    :gen_udp.send(port, target_ip, target_port_no, data)
+  def send(
+        payload,
+        %{
+          destination_address: destination_address,
+          destination_port_no: destination_port_no,
+          socket_handle: port
+        } = state
+      ) do
+    case :gen_udp.send(port, destination_address, destination_port_no, payload) do
+      :ok ->
+        {{:ok, demand: :input}, state}
+
+      {:error, _reason} = result ->
+        {result, state}
+    end
   end
 end

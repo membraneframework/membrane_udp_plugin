@@ -10,7 +10,7 @@ defmodule Membrane.Element.UDP.SinkTest do
 
   def state(_ctx) do
     {:ok, state} =
-      CommonPort.open(@local_address, 5000, %{
+      CommonPort.open(%{
         destination_address: @local_address,
         destination_port_no: 5001,
         local_address: @local_address,
