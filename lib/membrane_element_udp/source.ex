@@ -10,7 +10,7 @@ defmodule Membrane.Element.UDP.Source do
   import Mockery.Macro
 
   def_options address: [type: :string, description: "IP Address"],
-              port: [
+              port_no: [
                 type: :integer,
                 spec: pos_integer,
                 default: 5000,
@@ -25,11 +25,11 @@ defmodule Membrane.Element.UDP.Source do
   # Private API
 
   @impl true
-  def handle_init(%__MODULE__{address: address, port: port}) do
+  def handle_init(%__MODULE__{address: address, port_no: port_no}) do
     {:ok,
      %{
        address: address,
-       port: port,
+       port_no: port_no,
        socket_handle: nil
      }}
   end
@@ -39,10 +39,10 @@ defmodule Membrane.Element.UDP.Source do
         _ctx,
         %{
           address: address,
-          port: port
+          port_no: port_no
         } = state
       ),
-      do: mockable(CommonPort).open(address, port, state)
+      do: mockable(CommonPort).open(address, port_no, state)
 
   @impl true
   def handle_demand(_pad, _size, _, _ctx, state) do
@@ -51,11 +51,11 @@ defmodule Membrane.Element.UDP.Source do
 
   @impl true
 
-  def handle_other({:udp, _, address, port, payload}, _, state) do
+  def handle_other({:udp, _, address, port_no, payload}, _, state) do
     metadata =
       Map.new()
       |> Map.put(:udp_source_address, address)
-      |> Map.put(:udp_source_port, port)
+      |> Map.put(:udp_source_port, port_no)
 
     actions = [buffer: {:output, %Buffer{payload: payload, metadata: metadata}}]
 
@@ -68,6 +68,5 @@ defmodule Membrane.Element.UDP.Source do
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
     mockable(CommonPort).close(state)
-    {:ok, state}
   end
 end

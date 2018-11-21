@@ -86,6 +86,5 @@ defmodule Membrane.Element.UDP.Sink do
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
     mockable(CommonPort).close(state)
-    {:ok, state}
   end
 end

@@ -20,10 +20,10 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
 
     Pipeline.play(pipeline)
 
-    {:ok, receving_socket} =
+    {:ok, _receving_socket} =
       :gen_udp.open(@destination_port_no, [{:ip, @local_address}, :binary, {:active, true}])
 
-    Enum.map(@values, fn elem ->
+    Enum.each(@values, fn elem ->
       expected_value = to_string(elem)
       assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}
     end)
