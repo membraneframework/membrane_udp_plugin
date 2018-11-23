@@ -6,7 +6,7 @@ defmodule Membrane.Element.UDP.Sink do
   """
   use Membrane.Element.Base.Sink
   alias Membrane.Buffer
-  alias Membrane.Element.UDP.CommonPort
+  alias Membrane.Element.UDP.{Socket, CommonSocketBehaviour}
   import Mockery.Macro
 
   def_options destination_address: [
@@ -35,10 +35,23 @@ defmodule Membrane.Element.UDP.Sink do
 
   @impl true
   def handle_init(%__MODULE__{} = options) do
-    state =
-      options
-      |> Map.from_struct()
-      |> Map.put(:socket_handle, nil)
+    %__MODULE__{
+      destination_address: dst_address,
+      destination_port_no: dst_port_no,
+      local_address: local_address,
+      local_port_no: local_port_no
+    } = options
+
+    state = %{
+      dst_socket: %Socket{
+        ip_address: dst_address,
+        port_no: dst_port_no
+      },
+      local_socket: %Socket{
+        ip_address: local_address,
+        port_no: local_port_no
+      }
+    }
 
     {:ok, state}
   end
@@ -49,27 +62,21 @@ defmodule Membrane.Element.UDP.Sink do
   end
 
   @impl true
-  def handle_write(
-        :input,
-        %Buffer{payload: payload},
-        _ctx,
-        state
-      ) do
-    mockable(CommonPort).send(payload, state)
+  def handle_write(:input, %Buffer{payload: payload}, _ctx, state) do
+    %{dst_socket: dst_socket, local_socket: local_socket} = state
+
+    case mockable(Socket).send(dst_socket, local_socket, payload) do
+      :ok -> {{:ok, demand: :input}, state}
+    end
   end
 
   @impl true
-  def handle_stopped_to_prepared(
-        _ctx,
-        %{
-          local_address: address,
-          local_port_no: port_no
-        } = state
-      ),
-      do: mockable(CommonPort).open(state)
+  def handle_stopped_to_prepared(ctx, state) do
+    mockable(CommonSocketBehaviour).handle_stopped_to_prepared(ctx, state)
+  end
 
   @impl true
-  def handle_prepared_to_stopped(_ctx, state) do
-    mockable(CommonPort).close(state)
+  def handle_prepared_to_stopped(ctx, state) do
+    mockable(CommonSocketBehaviour).handle_prepared_to_stopped(ctx, state)
   end
 end

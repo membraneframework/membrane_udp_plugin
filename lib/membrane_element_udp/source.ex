@@ -6,7 +6,7 @@ defmodule Membrane.Element.UDP.Source do
   """
   use Membrane.Element.Base.Source
   alias Membrane.Buffer
-  alias Membrane.Element.UDP.CommonPort
+  alias Membrane.Element.UDP.{Socket, CommonSocketBehaviour}
   import Mockery.Macro
 
   def_options local_address: [type: :string, description: "IP Address"],
@@ -25,24 +25,9 @@ defmodule Membrane.Element.UDP.Source do
   # Private API
 
   @impl true
-  def handle_init(%__MODULE__{local_address: address, local_port_no: port_no}) do
-    {:ok,
-     %{
-       local_address: address,
-       local_port_no: port_no,
-       socket_handle: nil
-     }}
+  def handle_init(%__MODULE__{local_address: ip_address, local_port_no: port_no}) do
+    {:ok, %{local_socket: %Socket{ip_address: ip_address, port_no: port_no}}}
   end
-
-  @impl true
-  def handle_stopped_to_prepared(
-        _ctx,
-        %{
-          local_address: address,
-          local_port_no: port_no
-        } = state
-      ),
-      do: mockable(CommonPort).open(state)
 
   @impl true
   def handle_demand(_pad, _size, _, _ctx, state) do
@@ -66,7 +51,12 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
-  def handle_prepared_to_stopped(_ctx, state) do
-    mockable(CommonPort).close(state)
+  def handle_stopped_to_prepared(ctx, state) do
+    mockable(CommonSocketBehaviour).handle_stopped_to_prepared(ctx, state)
+  end
+
+  @impl true
+  def handle_prepared_to_stopped(ctx, state) do
+    mockable(CommonSocketBehaviour).handle_prepared_to_stopped(ctx, state)
   end
 end

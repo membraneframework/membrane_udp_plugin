@@ -1,5 +1,5 @@
 defmodule Membrane.Element.UDP.SourcePipelineTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
 
   alias Membrane.Pipeline
 
