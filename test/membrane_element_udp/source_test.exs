@@ -16,7 +16,7 @@ defmodule Membrane.Element.UDP.SourceTest do
 
   setup_all :state
 
-  test "parses udp messege", %{state: state} do
+  test "parses udp message", %{state: state} do
     example_binary_payload = "Hi there, I am binary"
     sender_port = 6666
     sender_address = {192, 168, 0, 1}

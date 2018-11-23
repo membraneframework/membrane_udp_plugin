@@ -1,6 +1,6 @@
 defmodule Membrane.Element.UDP.Source do
   @moduledoc """
-  Element that reads packets from UDP socket and sends their payload through output pad.
+  Element that reads packets from UDP socket and sends their payload through the output pad.
 
   See `options/0` for available options
   """
@@ -30,13 +30,13 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
-  def handle_demand(_pad, _size, _, _ctx, state) do
+  def handle_demand(_pad, _size, __type, _ctx, state) do
     {:ok, state}
   end
 
   @impl true
 
-  def handle_other({:udp, _, address, port_no, payload}, _, state) do
+  def handle_other({:udp, _socket_handle, address, port_no, payload}, _ctx, state) do
     metadata =
       Map.new()
       |> Map.put(:udp_source_address, address)
