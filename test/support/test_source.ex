@@ -16,7 +16,7 @@ defmodule Membrane.Element.TestSource do
     {:ok, %{data: data}}
   end
 
-  def handle_demand(:output, size, :buffers, _ctx, %{data: data} = state) do
+  def handle_demand(:output, size, :buffers, _context, %{data: data} = state) do
     case Enum.split(data, size) do
       {[], []} ->
         {{:ok, event: {:output, %Event.EndOfStream{}}}, state}
@@ -26,10 +26,5 @@ defmodule Membrane.Element.TestSource do
     end
   end
 
-  defp bufferize(data),
-    do:
-      Enum.map(
-        data,
-        &%Buffer{payload: &1}
-      )
+  defp bufferize(data), do: Enum.map(data, &%Buffer{payload: &1})
 end

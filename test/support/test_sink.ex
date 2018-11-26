@@ -24,7 +24,12 @@ defmodule Membrane.Element.TestSink do
   end
 
   @impl true
-  def handle_write(:input, buffer, _ctx, %{test_process: pid, name: name} = state) do
+  def handle_prepared_to_playing(_context, state) do
+    {{:ok, demand: :input}, state}
+  end
+
+  @impl true
+  def handle_write(:input, buffer, _context, %{test_process: pid, name: name} = state) do
     send(pid, {name, buffer})
     {{:ok, demand: :input}, state}
   end

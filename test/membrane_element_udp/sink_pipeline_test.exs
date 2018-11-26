@@ -6,9 +6,9 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
   @local_address {127, 0, 0, 1}
   @local_port_no 5050
   @destination_port_no 5005
-  @values 1..10
+  @values 1..100
 
-  test "Dozen of messages passes through pipeline" do
+  test "100 messages passes through pipeline" do
     data = @values |> Enum.map(&to_string(&1))
 
     {:ok, pipeline} =

@@ -1,9 +1,10 @@
 defmodule SocketSetup do
+  @moduledoc false
   import ExUnit.Callbacks, only: [on_exit: 1]
 
   alias Membrane.Element.UDP.Socket
 
-  def setup_socket_from_state(%{open_socket_from_state: requested, state: state} = ctx) do
+  def setup_socket_from_state(%{open_socket_from_state: requested, state: state}) do
     new_state =
       Enum.reduce(requested, state, fn socket_name, acc ->
         Map.update!(acc, socket_name, fn socket ->
@@ -11,7 +12,7 @@ defmodule SocketSetup do
         end)
       end)
 
-    %{ctx | state: new_state}
+    %{state: new_state}
   end
 
   def setup_socket(socket) do

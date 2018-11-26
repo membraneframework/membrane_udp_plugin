@@ -19,7 +19,7 @@ defmodule SourcePipeline do
     ]
 
     links = %{
-      {:udp_source, :output} => {:test_sink, :input}
+      {:udp_source, :output} => {:test_sink, :input, pull_buffer: [toilet: true]}
     }
 
     spec = %Membrane.Pipeline.Spec{
@@ -27,7 +27,13 @@ defmodule SourcePipeline do
       links: links
     }
 
-    {{:ok, spec}, %{}}
+    {{:ok, spec}, %{test_process: pid}}
+  end
+
+  @impl true
+  def handle_prepared_to_playing(%{test_process: pid} = state) do
+    send(pid, {__MODULE__, :playing})
+    {:ok, state}
   end
 
   @impl true

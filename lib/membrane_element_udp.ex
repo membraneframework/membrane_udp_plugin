@@ -1,4 +1,5 @@
 defmodule Membrane.Element.UDP do
+  @moduledoc false
   use Application
 
   def start(_type, _args) do

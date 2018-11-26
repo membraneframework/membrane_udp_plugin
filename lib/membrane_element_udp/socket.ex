@@ -1,12 +1,13 @@
 defmodule Membrane.Element.UDP.Socket do
   @moduledoc false
 
+  @enforce_keys [:port_no, :ip_address]
   defstruct [:port_no, :ip_address, :socket_handle]
 
   @type t :: %__MODULE__{
           port_no: :inet.port_number(),
           ip_address: :inet.socket_address(),
-          socket_handle: :gen_udp.socket()
+          socket_handle: :gen_udp.socket() | nil
         }
 
   @spec open(socket :: t()) :: {:ok, t()} | {:error, :inet.posix()}
