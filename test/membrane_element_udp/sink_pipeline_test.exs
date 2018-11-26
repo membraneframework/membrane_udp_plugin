@@ -4,8 +4,8 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
   alias Membrane.Pipeline
 
   @local_address {127, 0, 0, 1}
-  @local_port_no 5050
-  @destination_port_no 5005
+  @local_port_no 5051
+  @destination_port_no 5015
   @values 1..100
 
   test "100 messages passes through pipeline" do
