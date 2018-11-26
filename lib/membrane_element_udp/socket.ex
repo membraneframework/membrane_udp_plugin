@@ -21,7 +21,7 @@ defmodule Membrane.Element.UDP.Socket do
   @spec close(socket :: t()) :: t()
   def close(%__MODULE__{socket_handle: handle} = socket) when is_port(handle) do
     :gen_udp.close(handle)
-    %__MODULE__{socket | socket_handle: handle}
+    %__MODULE__{socket | socket_handle: nil}
   end
 
   @spec send(target :: t(), source :: t(), payload :: Membrane.Payload.t()) ::
