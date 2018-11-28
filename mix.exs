@@ -7,7 +7,6 @@ defmodule Membrane.Element.UDP.MixProject do
   def project do
     [
       app: :membrane_element_udp,
-      compilers: Mix.compilers(),
       version: @version,
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -50,9 +49,8 @@ defmodule Membrane.Element.UDP.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.19", only: :test, runtime: false},
       {:membrane_core, "~> 0.2"},
-      {:mockery, "~> 2.1", runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
     ]
   end

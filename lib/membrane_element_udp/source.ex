@@ -47,12 +47,8 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
-  def handle_stopped_to_prepared(context, state) do
-    CommonSocketBehaviour.handle_stopped_to_prepared(context, state)
-  end
+  defdelegate handle_stopped_to_prepared(context, state), to: CommonSocketBehaviour
 
   @impl true
-  def handle_prepared_to_stopped(context, state) do
-    CommonSocketBehaviour.handle_prepared_to_stopped(context, state)
-  end
+  defdelegate handle_prepared_to_stopped(context, state), to: CommonSocketBehaviour
 end

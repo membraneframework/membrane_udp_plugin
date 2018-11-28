@@ -7,7 +7,8 @@ defmodule Membrane.Element.UDP.Sink do
   use Membrane.Element.Base.Sink
   alias Membrane.Buffer
   alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}
-  import Mockery.Macro
+
+  @socket Socket
 
   def_options destination_address: [
                 type: :string,
@@ -65,19 +66,15 @@ defmodule Membrane.Element.UDP.Sink do
   def handle_write(:input, %Buffer{payload: payload}, _context, state) do
     %{dst_socket: dst_socket, local_socket: local_socket} = state
 
-    case mockable(Socket).send(dst_socket, local_socket, payload) do
+    case @socket.send(dst_socket, local_socket, payload) do
       :ok -> {{:ok, demand: :input}, state}
       {:error, cause} -> {{:error, cause}, state}
     end
   end
 
   @impl true
-  def handle_stopped_to_prepared(context, state) do
-    CommonSocketBehaviour.handle_stopped_to_prepared(context, state)
-  end
+  defdelegate handle_stopped_to_prepared(context, state), to: CommonSocketBehaviour
 
   @impl true
-  def handle_prepared_to_stopped(context, state) do
-    CommonSocketBehaviour.handle_prepared_to_stopped(context, state)
-  end
+  defdelegate handle_prepared_to_stopped(context, state), to: CommonSocketBehaviour
 end
