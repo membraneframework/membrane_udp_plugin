@@ -1,12 +1,14 @@
 defmodule SinkPipeline do
   @moduledoc false
   use Membrane.Pipeline
+
   alias Membrane.Element
+  alias Membrane.Element.UDP.SocketFactory
+  alias Membrane.Integration.TestingPipeline
 
-  @local_address {127, 0, 0, 1}
+  @local_address SocketFactory.local_address()
 
-  @impl true
-  def handle_init(%{
+  def start_link(%{
         sink_local_port_no: sink_local_port_no,
         sink_destination_port_no: sink_destination_port_no,
         test_data: data
@@ -25,21 +27,10 @@ defmodule SinkPipeline do
       {:test_source, :output} => {:udp_sink, :input}
     }
 
-    spec = %Membrane.Pipeline.Spec{
-      children: elements,
-      links: links
-    }
-
-    {{:ok, spec}, %{}}
-  end
-
-  @impl true
-  def handle_notification({:end_of_stream, :input}, :sink, %{pid: pid} = state) do
-    send(pid, :eos)
-    {:ok, state}
-  end
-
-  def handle_notification(_msg, _name, state) do
-    {:ok, state}
+    Pipeline.start_link(TestingPipeline, %{
+      elements: elements,
+      links: links,
+      test_process: self()
+    })
   end
 end

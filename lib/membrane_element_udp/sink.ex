@@ -5,10 +5,11 @@ defmodule Membrane.Element.UDP.Sink do
   See `options/0` for available options
   """
   use Membrane.Element.Base.Sink
+
+  import Mockery.Macro
+
   alias Membrane.Buffer
   alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}
-
-  @socket Socket
 
   def_options destination_address: [
                 type: :string,
@@ -66,7 +67,7 @@ defmodule Membrane.Element.UDP.Sink do
   def handle_write(:input, %Buffer{payload: payload}, _context, state) do
     %{dst_socket: dst_socket, local_socket: local_socket} = state
 
-    case @socket.send(dst_socket, local_socket, payload) do
+    case mockable(Socket).send(dst_socket, local_socket, payload) do
       :ok -> {{:ok, demand: :input}, state}
       {:error, cause} -> {{:error, cause}, state}
     end

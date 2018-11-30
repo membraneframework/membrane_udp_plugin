@@ -1,6 +1,7 @@
 defmodule Membrane.Element.TestSource do
   @moduledoc false
   use Membrane.Element.Base.Source
+
   alias Membrane.{Buffer, Event}
 
   def_options data: [
@@ -16,6 +17,7 @@ defmodule Membrane.Element.TestSource do
     {:ok, %{data: data}}
   end
 
+  @impl true
   def handle_demand(:output, size, :buffers, _context, %{data: data} = state) do
     case Enum.split(data, size) do
       {[], []} ->

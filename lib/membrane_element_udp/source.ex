@@ -5,6 +5,7 @@ defmodule Membrane.Element.UDP.Source do
   See `options/0` for available options
   """
   use Membrane.Element.Base.Source
+
   alias Membrane.Buffer
   alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}
 
@@ -21,20 +22,12 @@ defmodule Membrane.Element.UDP.Source do
                     mode: :push
                   ]
 
-  # Private API
-
   @impl true
   def handle_init(%__MODULE__{local_address: ip_address, local_port_no: port_no}) do
     {:ok, %{local_socket: %Socket{ip_address: ip_address, port_no: port_no}}}
   end
 
   @impl true
-  def handle_demand(_pad, _size, _type, _context, state) do
-    {:ok, state}
-  end
-
-  @impl true
-
   def handle_other({:udp, _socket_handle, address, port_no, payload}, _context, state) do
     metadata =
       Map.new()

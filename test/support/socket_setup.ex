@@ -1,5 +1,6 @@
 defmodule SocketSetup do
   @moduledoc false
+
   import ExUnit.Callbacks, only: [on_exit: 1]
 
   alias Membrane.Element.UDP.Socket
