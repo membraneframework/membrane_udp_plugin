@@ -26,8 +26,8 @@ defmodule Membrane.Element.UDP.CommonBehaviourTest do
     socket = %Socket{port_no: 123, ip_address: {127, 0, 0, 1}, socket_handle: :i_am_socket}
     mock(Socket, [close: 1], %Socket{socket | socket_handle: nil})
 
-    {:ok, %{local_socket: %Socket{socket_handle: nil}}} =
-      CommonSocketBehaviour.handle_prepared_to_stopped(nil, %{local_socket: socket})
+    assert {:ok, %{local_socket: %Socket{socket_handle: nil}}} =
+             CommonSocketBehaviour.handle_prepared_to_stopped(nil, %{local_socket: socket})
 
     assert_called(Socket, close: 1)
   end
