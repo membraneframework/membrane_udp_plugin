@@ -4,6 +4,8 @@ defmodule Membrane.Element.UDP.SourcePipelineTest do
   alias Membrane.Integration.TestingPipeline
   alias Membrane.Pipeline
 
+  import TestingPipeline.Assertions
+
   @local_address {127, 0, 0, 1}
   @local_port_no 5050
   @destination_port_no 5051
@@ -19,7 +21,9 @@ defmodule Membrane.Element.UDP.SourcePipelineTest do
 
     Pipeline.play(pipeline)
 
-    assert TestingPipeline.receive_message(:handle_prepared_to_playing, 10_000) == :ok
+    # assert TestingPipeline.receive_message(:handle_prepared_to_playing, 10_000) == :ok
+
+    receive_message(:handle_prepared_to_playing)
 
     Enum.map(data, fn elem ->
       udp_like_message = {:udp, nil, @local_address, @local_port_no, elem}

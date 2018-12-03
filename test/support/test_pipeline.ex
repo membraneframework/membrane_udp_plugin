@@ -7,20 +7,6 @@ defmodule Membrane.Integration.TestingPipeline do
     send(pipeline, {:for_element, child, message})
   end
 
-  @spec receive_message(any(), non_neg_integer()) :: :ok | {:ok, any()} | {:error, :timeout}
-  def receive_message(message, timeout) do
-    receive do
-      {__MODULE__, ^message} ->
-        :ok
-
-      {__MODULE__, {^message, payload}} ->
-        {:ok, payload}
-    after
-      timeout ->
-        {:error, :timeout}
-    end
-  end
-
   @impl true
   def handle_init(%{
         elements: elements,
