@@ -4,7 +4,7 @@ defmodule SinkPipeline do
 
   alias Membrane.Element
   alias Membrane.Element.UDP.SocketFactory
-  alias Membrane.Integration.TestingPipeline
+  alias Membrane.Testing
 
   @local_address SocketFactory.local_address()
 
@@ -20,14 +20,14 @@ defmodule SinkPipeline do
         local_address: @local_address,
         local_port_no: sink_local_port_no
       },
-      test_source: %Membrane.Element.TestSource{data: data}
+      test_source: %Testing.DataSource{data: data}
     ]
 
     links = %{
       {:test_source, :output} => {:udp_sink, :input}
     }
 
-    Pipeline.start_link(TestingPipeline, %{
+    Pipeline.start_link(Testing.Pipeline, %Testing.Pipeline.Options{
       elements: elements,
       links: links,
       test_process: self()
