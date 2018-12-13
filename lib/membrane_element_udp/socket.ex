@@ -1,94 +1,37 @@
 defmodule Membrane.Element.UDP.Socket do
-  @moduledoc """
-  Element that can be used to read from and write to UDP sockets.
+  @moduledoc false
 
-  It will bind to local address:port specified as `:local_address` and `:local_port`
-  fields of the `Membrane.Element.UDP.SocketOptions` struct and just send all
-  received buffers to the source pad.
+  @enforce_keys [:port_no, :ip_address]
+  defstruct [:port_no, :ip_address, :socket_handle]
 
-  It will also send all received buffers on the sink pad to destination specified
-  as `:remote_address` and `:remote_port` in the
-  `Membrane.Element.UDP.SocketOptions` struct.
+  @type t :: %__MODULE__{
+          port_no: :inet.port_number(),
+          ip_address: :inet.socket_address(),
+          socket_handle: :gen_udp.socket() | nil
+        }
 
-  If remote peer is not specified in `Membrane.Element.UDP.SocketOptions` struct,
-  it will remember address and port of the first received packet.
-    """
-
-  use Membrane.Element.Base.Filter
-  alias Membrane.Element.UDP.SocketOptions
-  alias Membrane.Buffer.Metadata
-  use Membrane.Mixins.Log
-
-  def_known_source_pads %{
-    :source => {:always, [:any]}
-  }
-
-  def_known_sink_pads %{
-    :sink => {:always, [:any]}
-  }
-
-
-  @doc false
-  def handle_init(%SocketOptions{} = options) do
-    {:ok, Map.put_new(options, :socket, nil)}
-  end
-
-
-  @doc false
-  def handle_prepare(:stopped, %{local_port: port, local_address: address, tos: tos} = state) do
-    {:ok, socket} = :gen_udp.open(port, [{:ip, address}, {:tos, tos}, :binary])
-    :gen_udp.controlling_process(socket, self())
-    {:ok, %{state | socket: socket}}
-  end
-
-
-  @doc false
-  def handle_prepare(:playing, %{socket: socket} = state) do
-    :ok = :gen_udp.close(socket)
-    {:ok, %{state | socket: nil}}
-  end
-
-
-  @doc false
-  def handle_buffer(:sink, _caps, %Membrane.Buffer{payload: data}, %{socket: socket, remote_address: remote_address, remote_port: remote_port} = state) do
-    if is_nil(remote_port) or is_nil(remote_address) do
-      warn("Could not send udp packet. Remote port or address not specified")
-      {:ok, state}
-    else
-      case :gen_udp.send(socket, remote_address, remote_port, data) do
-        :ok ->
-          {:ok, state}
-        {:error, reason} ->
-          {:error, reason, state}
-      end
+  @spec open(socket :: t()) :: {:ok, t()} | {:error, :inet.posix()}
+  def open(%__MODULE__{port_no: port_no, ip_address: ip} = socket) do
+    case :gen_udp.open(port_no, [{:ip, ip}, :binary, {:active, true}]) do
+      {:ok, socket_handle} -> {:ok, %__MODULE__{socket | socket_handle: socket_handle}}
+      error -> error
     end
   end
 
-
-  @doc false
-  def handle_other(message, state) do
-
-    state = case message do
-      {:udp, _port, udp_source_address, udp_source_port, _data} ->
-        %{state | remote_address: udp_source_address, remote_port: udp_source_port}
-      _ -> state
-    end
-
-
-    case message do
-      {:udp, port, udp_source_address, udp_source_port, data} ->
-        debug("Received UDP packet on port #{inspect(port)} from #{inspect(udp_source_address)}:#{inspect(udp_source_port)}")
-
-        metadata = Metadata.new |>
-                   Metadata.put(:udp_source_address, udp_source_address) |>
-                   Metadata.put(:udp_source_port, udp_source_port)
-
-        {:ok, [{:send, {:source, %Membrane.Buffer{payload: data, metadata: metadata}}}], state}
-
-      _ ->
-        {:error, :invalid_message, state}
-    end
-
+  @spec close(socket :: t()) :: t()
+  def close(%__MODULE__{socket_handle: handle} = socket) when is_port(handle) do
+    :gen_udp.close(handle)
+    %__MODULE__{socket | socket_handle: nil}
   end
 
+  @spec send(target :: t(), source :: t(), payload :: Membrane.Payload.t()) ::
+          :ok | {:error, :not_owner | :inet.posix()}
+  def send(
+        %__MODULE__{port_no: target_port_no, ip_address: target_ip},
+        %__MODULE__{socket_handle: socket_handle},
+        payload
+      )
+      when is_port(socket_handle) do
+    :gen_udp.send(socket_handle, target_ip, target_port_no, payload)
+  end
 end

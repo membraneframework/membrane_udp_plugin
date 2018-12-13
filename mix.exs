@@ -1,36 +1,59 @@
-defmodule Membrane.Element.UDP.Mixfile do
+defmodule Membrane.Element.UDP.MixProject do
   use Mix.Project
 
-  def project do
-    [app: :membrane_element_udp,
-     version: "0.0.1",
-     elixir: "~> 1.3",
-     elixirc_paths: elixirc_paths(Mix.env),
-     description: "Membrane Multimedia Framework (UDP Element)",
-     maintainers: ["Mateusz Nowak"],
-     licenses: ["LGPL"],
-     name: "Membrane Element: UDP",
-     source_url: "https://github.com/membraneframework/membrane-element-udp",
-     preferred_cli_env: [espec: :test],
-     deps: deps()]
-  end
+  @version "0.2.0"
+  @github_url "https://github.com/membraneframework/membrane-element-udp"
 
+  def project do
+    [
+      app: :membrane_element_udp,
+      version: @version,
+      elixir: "~> 1.7",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      description: "Membrane Multimedia Framework (UDP Element)",
+      package: package(),
+      name: "Membrane Element: UDP",
+      source_url: @github_url,
+      docs: docs(),
+      deps: deps()
+    ]
+  end
 
   def application do
-    [applications: [
-      :membrane_core
-    ], mod: {Membrane.Element.UDP, []}]
+    [
+      extra_applications: []
+    ]
   end
 
-
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib",]
+  defp elixirc_paths(_), do: ["lib"]
 
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md"],
+      source_ref: "v#{@version}"
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Membrane Team"],
+      licenses: ["Apache 2.0"],
+      links: %{
+        "GitHub" => @github_url,
+        "Membrane Framework Homepage" => "https://membraneframework.org"
+      }
+    ]
+  end
 
   defp deps do
     [
-      {:membrane_core, git: "git@github.com:membraneframework/membrane-core.git", branch: "v0.1"},
-      {:espec, "~> 1.1.2", only: :test},
+      {:ex_doc, "~> 0.19", only: [:dev, :test], runtime: false},
+      {:membrane_core,
+       git: "git@github.com:membraneframework/membrane-core", branch: "testing-tools"},
+      {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
+      {:mockery, "~> 2.3.0", runtime: false}
     ]
   end
 end

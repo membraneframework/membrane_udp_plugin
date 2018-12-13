@@ -1,15 +1,19 @@
 # Membrane Multimedia Framework: UDP Element
 
-This package provides element that can be used to read from and write to UDP sockets.
+This package provides elements that can be used to read from and write to UDP sockets.
 
-# Installation
+## Installation
 
-Add the following line to your `deps` in `mix.exs`.  Run `mix deps.get`.
+Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-{:membrane_element_udp, git: "git@github.com:membraneframework/membrane-element-udp.git"}
+{:membrane_element_udp, "~> 0.2"}
 ```
 
-# Authors
+## Copyright and License
 
-Mateusz Nowak
+Copyright 2018, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane)
+
+[![Software Mansion](https://membraneframework.github.io/static/logo/swm_logo_readme.png)](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane)
+
+Licensed under the [Apache License, Version 2.0](LICENSE)
