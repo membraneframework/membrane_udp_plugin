@@ -50,7 +50,7 @@ defmodule Membrane.Element.UDP.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.19", only: [:dev, :test], runtime: false},
-      {:membrane_core, github: "membraneframework/membrane-core", branch: "testing-tools"},
+      {:membrane_core, "~> 0.2.1"},
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:mockery, "~> 2.3.0", runtime: false}
     ]
