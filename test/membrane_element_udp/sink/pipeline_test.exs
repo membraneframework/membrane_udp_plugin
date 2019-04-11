@@ -3,7 +3,7 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
 
   import SocketSetup
 
-  alias Membrane.Element.UDP.SocketFactory
+  alias Membrane.Element.UDP.{SocketFactory, Sink}
   alias Membrane.Pipeline
 
   @local_address SocketFactory.local_address()
@@ -24,17 +24,24 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
     data = @values |> Enum.map(&to_string(&1))
 
     {:ok, pipeline} =
-      SinkPipeline.start_link(%{
-        sink_local_port_no: @local_port_no,
-        sink_destination_port_no: @destination_port_no,
-        test_data: data
+      Membrane.Testing.Pipeline.start_link(%Membrane.Testing.Pipeline.Options{
+        elements: [
+          test_source: %Membrane.Testing.DataSource{data: data},
+          udp_sink: %Sink{
+            destination_address: SocketFactory.local_address(),
+            destination_port_no: @destination_port_no,
+            local_address: SocketFactory.local_address(),
+            local_port_no: @local_port_no
+          }
+        ],
+        test_process: self()
       })
 
-    Pipeline.play(pipeline)
+    assert :ok == Pipeline.play(pipeline)
 
     Enum.each(@values, fn elem ->
       expected_value = to_string(elem)
-      assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}
+      assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}, 1000
     end)
   end
 end

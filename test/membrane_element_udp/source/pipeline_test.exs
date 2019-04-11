@@ -1,8 +1,9 @@
 defmodule Membrane.Element.UDP.SourcePipelineTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
 
   alias Membrane.Testing
   alias Membrane.Pipeline
+  alias Membrane.Element.UDP.{SocketFactory, Source}
 
   import Testing.Pipeline.Assertions
 
@@ -15,8 +16,16 @@ defmodule Membrane.Element.UDP.SourcePipelineTest do
     data = @values |> Enum.map(&to_string(&1))
 
     {:ok, pipeline} =
-      SourcePipeline.start_link(%{
-        port_no: @destination_port_no
+      Pipeline.start_link(Testing.Pipeline, %Testing.Pipeline.Options{
+        elements: [
+          udp_source: %Source{
+            local_address: SocketFactory.local_address(),
+            local_port_no: @destination_port_no
+          },
+          test_sink: %Testing.Sink{target: self()}
+        ],
+        test_process: self(),
+        monitored_callbacks: [:handle_prepared_to_playing]
       })
 
     Pipeline.play(pipeline)

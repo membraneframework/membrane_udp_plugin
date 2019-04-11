@@ -49,8 +49,8 @@ defmodule Membrane.Element.UDP.MixProject do
 
   defp deps do
     [
+      {:membrane_core, "~> 0.3"},
       {:ex_doc, "~> 0.19", only: [:dev, :test], runtime: false},
-      {:membrane_core, "~> 0.2.1"},
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:mockery, "~> 2.3.0", runtime: false}
     ]

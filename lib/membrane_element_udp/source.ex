@@ -17,10 +17,9 @@ defmodule Membrane.Element.UDP.Source do
                 description: "UDP target port"
               ]
 
-  def_output_pads output: [
-                    caps: :any,
-                    mode: :push
-                  ]
+  def_output_pad :output,
+    caps: :any,
+    mode: :push
 
   @impl true
   def handle_init(%__MODULE__{local_address: ip_address, local_port_no: port_no}) do

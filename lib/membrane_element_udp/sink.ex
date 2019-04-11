@@ -28,10 +28,9 @@ defmodule Membrane.Element.UDP.Sink do
                 description: "UDP local port"
               ]
 
-  def_input_pads input: [
-                   caps: :any,
-                   demand_unit: :buffers
-                 ]
+  def_input_pad :input,
+    caps: :any,
+    demand_unit: :buffers
 
   # Private API
 
