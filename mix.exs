@@ -49,7 +49,8 @@ defmodule Membrane.Element.UDP.MixProject do
 
   defp deps do
     [
-      {:membrane_core, "~> 0.3"},
+      {:membrane_core,
+       github: "membraneframework/membrane-core", branch: "master", override: true},
       {:ex_doc, "~> 0.19", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:mockery, "~> 2.3.0", runtime: false}
