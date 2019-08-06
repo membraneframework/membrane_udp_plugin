@@ -4,7 +4,7 @@ defmodule Membrane.Element.UDP.Source do
 
   See `options/0` for available options
   """
-  use Membrane.Element.Base.Source
+  use Membrane.Source
 
   alias Membrane.Buffer
   alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}

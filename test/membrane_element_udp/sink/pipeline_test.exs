@@ -3,8 +3,8 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
 
   import SocketSetup
 
-  alias Membrane.Element.UDP.{SocketFactory, Sink}
-  alias Membrane.Pipeline
+  alias Membrane.Element.UDP.{Sink, SocketFactory}
+  alias Membrane.Testing.{Pipeline, Source}
 
   @local_address SocketFactory.local_address()
   @local_port_no 5051
@@ -23,19 +23,18 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
   test "100 messages passes through pipeline" do
     data = @values |> Enum.map(&to_string(&1))
 
-    {:ok, pipeline} =
-      Membrane.Testing.Pipeline.start_link(%Membrane.Testing.Pipeline.Options{
-        elements: [
-          test_source: %Membrane.Testing.DataSource{data: data},
-          udp_sink: %Sink{
-            destination_address: SocketFactory.local_address(),
-            destination_port_no: @destination_port_no,
-            local_address: SocketFactory.local_address(),
-            local_port_no: @local_port_no
-          }
-        ],
-        test_process: self()
-      })
+    assert {:ok, pipeline} =
+             Pipeline.start_link(%Pipeline.Options{
+               elements: [
+                 test_source: %Source{output: data},
+                 udp_sink: %Sink{
+                   destination_address: SocketFactory.local_address(),
+                   destination_port_no: @destination_port_no,
+                   local_address: SocketFactory.local_address(),
+                   local_port_no: @local_port_no
+                 }
+               ]
+             })
 
     assert :ok == Pipeline.play(pipeline)
 

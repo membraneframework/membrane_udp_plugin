@@ -4,7 +4,7 @@ defmodule Membrane.Element.UDP.Sink do
 
   See `options/0` for available options
   """
-  use Membrane.Element.Base.Sink
+  use Membrane.Sink
 
   import Mockery.Macro
 
