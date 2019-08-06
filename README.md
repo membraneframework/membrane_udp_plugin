@@ -1,5 +1,7 @@
 # Membrane Multimedia Framework: UDP Element
 
+[![CircleCI](https://circleci.com/gh/membraneframework/membrane-element-udp.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane-element-udp)
+
 This package provides elements that can be used to read from and write to UDP sockets.
 
 ## Installation
