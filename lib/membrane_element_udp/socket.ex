@@ -2,17 +2,18 @@ defmodule Membrane.Element.UDP.Socket do
   @moduledoc false
 
   @enforce_keys [:port_no, :ip_address]
-  defstruct [:port_no, :ip_address, :socket_handle]
+  defstruct [:port_no, :ip_address, :socket_handle, sock_opts: []]
 
   @type t :: %__MODULE__{
           port_no: :inet.port_number(),
           ip_address: :inet.socket_address(),
-          socket_handle: :gen_udp.socket() | nil
+          socket_handle: :gen_udp.socket() | nil,
+          sock_opts: [:gen_udp.option()] | nil
         }
 
   @spec open(socket :: t()) :: {:ok, t()} | {:error, :inet.posix()}
-  def open(%__MODULE__{port_no: port_no, ip_address: ip} = socket) do
-    case :gen_udp.open(port_no, [{:ip, ip}, :binary, {:active, true}]) do
+  def open(%__MODULE__{port_no: port_no, ip_address: ip, sock_opts: sock_opts} = socket) do
+    case :gen_udp.open(port_no, [:binary, ip: ip, active: true] ++ sock_opts) do
       {:ok, socket_handle} -> {:ok, %__MODULE__{socket | socket_handle: socket_handle}}
       error -> error
     end

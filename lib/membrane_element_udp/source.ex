@@ -15,6 +15,13 @@ defmodule Membrane.Element.UDP.Source do
                 spec: pos_integer,
                 default: 5000,
                 description: "UDP target port"
+              ],
+              recv_buffer_size: [
+                type: :integer,
+                spec: pos_integer,
+                default: 16_384,
+                description:
+                  "Size of the receive buffer. Packages of size greater than this buffer will be truncated"
               ]
 
   def_output_pad :output,
@@ -22,8 +29,14 @@ defmodule Membrane.Element.UDP.Source do
     mode: :push
 
   @impl true
-  def handle_init(%__MODULE__{local_address: ip_address, local_port_no: port_no}) do
-    {:ok, %{local_socket: %Socket{ip_address: ip_address, port_no: port_no}}}
+  def handle_init(%__MODULE__{} = opts) do
+    socket = %Socket{
+      ip_address: opts.local_address,
+      port_no: opts.local_port_no,
+      sock_opts: [recbuf: opts.recv_buffer_size]
+    }
+
+    {:ok, %{local_socket: socket}}
   end
 
   @impl true
