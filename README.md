@@ -16,7 +16,7 @@ Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ## Usage example
 
-The example below shows 2 pipelines - `UDPDemo.Send` downloads an example file over HTTP and
+The example below shows 2 pipelines. `UDPDemo.Send` downloads an example file over HTTP and
 sends it over UDP socket via localhost:
 
 ```elixir
@@ -83,29 +83,31 @@ defmodule UDPDemo.Receive do
 end
 ```
 
-The snippet below presents how to run these pipelines. For convenience it uses `Membrane.Testing.Pipeline`
+The snippet below presents how to run these pipelines. For convenience, it uses `Membrane.Testing.Pipeline`
 that wraps the pipeline modules above and allows to assert on state changes and end of stream events from the elements.
+Thanks to that, we can make sure the data is sent only when the receiving end is ready and the pipelines are stopped
+after everything has been sent.
 
 ```elixir
 alias Membrane.Testing.Pipeline
 import Membrane.Testing.Assertions
 
 {:ok, sender} = Pipeline.start_link(%Pipeline.Options{module: UDPDemo.Send})
-{:ok, recv} = Pipeline.start_link(%Pipeline.Options{module: UDPDemo.Receive})
+{:ok, receiver} = Pipeline.start_link(%Pipeline.Options{module: UDPDemo.Receive})
 
-:ok = Pipeline.play(recv)
+:ok = Pipeline.play(receiver)
 
-assert_pipeline_playback_changed(recv, :prepared, :playing)
+assert_pipeline_playback_changed(receiver, :prepared, :playing)
 
 :ok = Pipeline.play(sender)
 
 assert_end_of_stream(sender, :udp, :input, 5000)
 
-:ok = Pipeline.stop_and_terminate(sender)
-
+:ok = Pipeline.stop(sender)
 assert_pipeline_playback_changed(sender, :prepared, :stopped)
 
-:ok = Pipeline.stop_and_terminate(recv)
+:ok = Pipeline.stop(receiver)
+assert_pipeline_playback_changed(receiver, :prepared, :stopped)
 ```
 
 The deps required to run the example:
