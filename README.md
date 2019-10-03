@@ -53,7 +53,7 @@ saves the data to the `/tmp/udp-recv.h264` file.
 
 Bear in mind that for other files/sending pipelines you may need do adjust
 [`recv_buffer_size`](https://hexdocs.pm/membrane_element_udp/Membrane.Element.UDP.Source.html#module-element-options)
-option  in `Membrane.Element.UDP.Source` that determines the maximum size of received packets.
+option in `Membrane.Element.UDP.Source` that determines the maximum size of received packets.
 
 ```elixir
 defmodule UDPDemo.Receive do
@@ -125,8 +125,8 @@ end
 
 ## Copyright and License
 
-Copyright 2019, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane)
+Copyright 2019, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane-element-udp)
 
-[![Software Mansion](https://membraneframework.github.io/static/logo/swm_logo_readme.png)](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane)
+[![Software Mansion](https://membraneframework.github.io/static/logo/swm_logo_readme.png)](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane-element-udp)
 
 Licensed under the [Apache License, Version 2.0](LICENSE)
