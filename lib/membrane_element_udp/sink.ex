@@ -1,8 +1,6 @@
 defmodule Membrane.Element.UDP.Sink do
   @moduledoc """
-  Element that reads packets from UDP socket and sends their payload through output pad.
-
-  See `options/0` for available options
+  Element that sends buffers received on the input pad over a UDP socket.
   """
   use Membrane.Sink
 
@@ -12,20 +10,32 @@ defmodule Membrane.Element.UDP.Sink do
   alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}
 
   def_options destination_address: [
-                type: :string,
-                description: "IP Address that packets will be sent to"
+                type: :ip_address,
+                spec: :inet.ip_address(),
+                description: "An IP Address that the packets will be sent to."
               ],
               destination_port_no: [
                 type: :integer,
-                spec: pos_integer,
-                description: "UDP target port"
+                spec: :inet.port_number(),
+                description: "A UDP port number of a target."
               ],
-              local_address: [type: :string, description: "Local IP Address"],
+              local_address: [
+                type: :ip_address,
+                spec: :inet.socket_address(),
+                default: :any,
+                description: """
+                An IP Address set for a UDP socket used to sent packets. It allows to specify which
+                network interface to use if there's more than one.
+                """
+              ],
               local_port_no: [
                 type: :integer,
-                spec: pos_integer,
-                default: 5000,
-                description: "UDP local port"
+                spec: :inet.port_number(),
+                default: 0,
+                description: """
+                A UDP port number for the socket used to sent packets. If set to `0` (default)
+                the underlying OS will assign a free UDP port.
+                """
               ]
 
   def_input_pad :input,

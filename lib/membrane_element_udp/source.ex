@@ -1,27 +1,34 @@
 defmodule Membrane.Element.UDP.Source do
   @moduledoc """
-  Element that reads packets from UDP socket and sends their payload through the output pad.
-
-  See `options/0` for available options
+  Element that reads packets from a UDP socket and sends their payloads through the output pad.
   """
   use Membrane.Source
 
   alias Membrane.Buffer
   alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}
 
-  def_options local_address: [type: :string, description: "IP Address"],
-              local_port_no: [
+  def_options local_port_no: [
                 type: :integer,
                 spec: pos_integer,
                 default: 5000,
-                description: "UDP target port"
+                description: "A UDP port number used when opening a receiving socket."
+              ],
+              local_address: [
+                type: :ip_address,
+                spec: :inet.socket_address(),
+                default: :any,
+                description: """
+                An IP Address on which the socket will listen. It allows to choose which
+                network interface to use if there's more than one.
+                """
               ],
               recv_buffer_size: [
                 type: :integer,
                 spec: pos_integer,
                 default: 16_384,
-                description:
-                  "Size of the receive buffer. Packages of size greater than this buffer will be truncated"
+                description: """
+                Size of the receive buffer. Packages of size greater than this buffer will be truncated
+                """
               ]
 
   def_output_pad :output,
