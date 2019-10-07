@@ -13,9 +13,18 @@ defmodule Membrane.Element.UDP.Socket do
 
   @spec open(socket :: t()) :: {:ok, t()} | {:error, :inet.posix()}
   def open(%__MODULE__{port_no: port_no, ip_address: ip, sock_opts: sock_opts} = socket) do
-    case :gen_udp.open(port_no, [:binary, ip: ip, active: true] ++ sock_opts) do
-      {:ok, socket_handle} -> {:ok, %__MODULE__{socket | socket_handle: socket_handle}}
-      error -> error
+    open_result = :gen_udp.open(port_no, [:binary, ip: ip, active: true] ++ sock_opts)
+
+    with {:ok, socket_handle} <- open_result do
+      port_no =
+        if port_no == 0 do
+          {:ok, os_gen_port} = :inet.port(socket_handle)
+          os_gen_port
+        else
+          port_no
+        end
+
+      {:ok, %__MODULE__{socket | socket_handle: socket_handle, port_no: port_no}}
     end
   end
 
