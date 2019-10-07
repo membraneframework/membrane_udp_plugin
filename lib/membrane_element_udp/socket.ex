@@ -15,16 +15,17 @@ defmodule Membrane.Element.UDP.Socket do
   def open(%__MODULE__{port_no: port_no, ip_address: ip, sock_opts: sock_opts} = socket) do
     open_result = :gen_udp.open(port_no, [:binary, ip: ip, active: true] ++ sock_opts)
 
-    with {:ok, socket_handle} <- open_result do
-      port_no =
-        if port_no == 0 do
-          {:ok, os_gen_port} = :inet.port(socket_handle)
-          os_gen_port
-        else
-          port_no
-        end
+    with {:ok, socket_handle} <- open_result,
+         # Port may change if 0 is used, ip - when either `:any` or `:loopback` is passed as ip
+         {:ok, {real_ip_addr, real_port_no}} <- :inet.sockname(socket_handle) do
+      updated_socket = %__MODULE__{
+        socket
+        | socket_handle: socket_handle,
+          port_no: real_port_no,
+          ip_address: real_ip_addr
+      }
 
-      {:ok, %__MODULE__{socket | socket_handle: socket_handle, port_no: port_no}}
+      {:ok, updated_socket}
     end
   end
 
