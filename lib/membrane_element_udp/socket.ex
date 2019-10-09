@@ -16,7 +16,7 @@ defmodule Membrane.Element.UDP.Socket do
     open_result = :gen_udp.open(port_no, [:binary, ip: ip, active: true] ++ sock_opts)
 
     with {:ok, socket_handle} <- open_result,
-         # Port may change if 0 is used, ip - when either `:any` or `:loopback` is passed as ip
+         # Port may change if 0 is used, ip - when either `:any` or `:loopback` is passed
          {:ok, {real_ip_addr, real_port_no}} <- :inet.sockname(socket_handle) do
       updated_socket = %__MODULE__{
         socket
