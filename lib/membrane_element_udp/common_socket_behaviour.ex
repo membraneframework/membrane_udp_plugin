@@ -14,8 +14,12 @@ defmodule Membrane.Element.UDP.CommonSocketBehaviour do
         ) :: Base.callback_return_t()
   def handle_stopped_to_prepared(_context, %{local_socket: local_socket} = state) do
     case mockable(Socket).open(local_socket) do
-      {:ok, socket} -> {:ok, %{state | local_socket: socket}}
-      {:error, reason} -> {{:error, reason}, state}
+      {:ok, socket} ->
+        notification = {:connection_info, socket.ip_address, socket.port_no}
+        {{:ok, notify: notification}, %{state | local_socket: socket}}
+
+      {:error, reason} ->
+        {{:error, reason}, state}
     end
   end
 
