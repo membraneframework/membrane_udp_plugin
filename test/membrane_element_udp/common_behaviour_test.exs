@@ -14,7 +14,7 @@ defmodule Membrane.Element.UDP.CommonBehaviourTest do
 
       state = %{local_socket: socket}
 
-      assert {:ok, %{local_socket: result_socket}} =
+      assert {{:ok, _actions}, %{local_socket: result_socket}} =
                CommonSocketBehaviour.handle_stopped_to_prepared(nil, state)
 
       assert result_socket.socket_handle == self()

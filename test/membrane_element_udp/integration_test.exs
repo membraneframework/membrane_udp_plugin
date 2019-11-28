@@ -23,6 +23,9 @@ defmodule Membrane.Element.UDP.IntegrationTest do
         ]
       })
 
+    :ok = Pipeline.prepare(receiver)
+    assert_pipeline_notified(receiver, :source, {:connection_info, @localhostv4, @target_port})
+
     :ok = Pipeline.play(receiver)
     assert_pipeline_playback_changed(receiver, :prepared, :playing)
 
@@ -34,8 +37,15 @@ defmodule Membrane.Element.UDP.IntegrationTest do
         ]
       })
 
-    :ok = Pipeline.play(sender)
+    :ok = Pipeline.prepare(sender)
 
+    assert_pipeline_notified(
+      sender,
+      :sink,
+      {:connection_info, {0, 0, 0, 0}, _some_ephemeral_port}
+    )
+
+    :ok = Pipeline.play(sender)
     assert_end_of_stream(sender, :sink)
 
     1..@payload_frames
