@@ -9,7 +9,10 @@ defmodule Membrane.Element.UDP.SourceTest do
     sender_address = {192, 168, 0, 1}
     state = :unchanged
     message = {:udp, 5000, sender_address, sender_port, example_binary_payload}
-    assert {{:ok, actions}, ^state} = Source.handle_other(message, nil, state)
+
+    assert {{:ok, actions}, ^state} =
+             Source.handle_other(message, %{playback_state: :playing}, state)
+
     assert {:output, buffer} = Keyword.get(actions, :buffer)
 
     assert %Membrane.Buffer{
