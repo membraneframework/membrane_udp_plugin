@@ -63,7 +63,7 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
-  def handle_other({:udp, _socket_handle, address, port_no, payload}, _ctx, state) do
+  def handle_other({:udp, _socket_handle, _address, _port_no, _payload}, _ctx, state) do
     {:ok, state}
   end
 
