@@ -47,7 +47,11 @@ defmodule Membrane.Element.UDP.Source do
   end
 
   @impl true
-  def handle_other({:udp, _socket_handle, address, port_no, payload}, _context, state) do
+  def handle_other(
+        {:udp, _socket_handle, address, port_no, payload},
+        %{playback_state: :playing},
+        state
+      ) do
     metadata =
       Map.new()
       |> Map.put(:udp_source_address, address)
@@ -56,6 +60,11 @@ defmodule Membrane.Element.UDP.Source do
     actions = [buffer: {:output, %Buffer{payload: payload, metadata: metadata}}]
 
     {{:ok, actions}, state}
+  end
+
+  @impl true
+  def handle_other({:udp, _socket_handle, address, port_no, payload}, _ctx, state) do
+    {:ok, state}
   end
 
   @impl true
