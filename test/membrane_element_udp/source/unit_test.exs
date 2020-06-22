@@ -16,8 +16,14 @@ defmodule Membrane.Element.UDP.SourceTest do
     assert {:output, buffer} = Keyword.get(actions, :buffer)
 
     assert %Membrane.Buffer{
-             payload: example_binary_payload,
-             metadata: %{udp_source_address: sender_address, udp_source_port: sender_port}
-           } == buffer
+             payload: ^example_binary_payload,
+             metadata: %{
+               udp_source_address: ^sender_address,
+               udp_source_port: ^sender_port,
+               arrival_ts: arrival_ts
+             }
+           } = buffer
+
+    assert_in_delta(arrival_ts, Membrane.Time.vm_time(), 2 |> Membrane.Time.milliseconds())
   end
 end
