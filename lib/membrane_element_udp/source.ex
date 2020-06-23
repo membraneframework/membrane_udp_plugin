@@ -56,6 +56,7 @@ defmodule Membrane.Element.UDP.Source do
       Map.new()
       |> Map.put(:udp_source_address, address)
       |> Map.put(:udp_source_port, port_no)
+      |> Map.put(:arrival_ts, Membrane.Time.vm_time())
 
     actions = [buffer: {:output, %Buffer{payload: payload, metadata: metadata}}]
 

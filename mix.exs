@@ -52,7 +52,7 @@ defmodule Membrane.Element.UDP.MixProject do
     [
       {:membrane_core, "~> 0.5.0"},
       {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:mockery, "~> 2.3.0", runtime: false}
     ]
   end
