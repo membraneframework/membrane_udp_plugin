@@ -4,7 +4,7 @@ defmodule Membrane.Element.UDP.Source do
   """
   use Membrane.Source
 
-  alias Membrane.{Buffer, Stream}
+  alias Membrane.{Buffer, RemoteStream}
   alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}
 
   def_options local_port_no: [
@@ -31,7 +31,7 @@ defmodule Membrane.Element.UDP.Source do
                 """
               ]
 
-  def_output_pad :output, caps: {Stream, type: :packet_stream}, mode: :push
+  def_output_pad :output, caps: {RemoteStream, type: :packetized}, mode: :push
 
   @impl true
   def handle_init(%__MODULE__{} = opts) do
@@ -46,7 +46,7 @@ defmodule Membrane.Element.UDP.Source do
 
   @impl true
   def handle_prepared_to_playing(_ctx, state) do
-    {{:ok, caps: {:output, %Stream{type: :packet_stream}}}, state}
+    {{:ok, caps: {:output, %RemoteStream{type: :packetized}}}, state}
   end
 
   @impl true
