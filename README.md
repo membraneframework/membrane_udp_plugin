@@ -11,7 +11,7 @@ This package provides elements that can be used to read from and write to UDP so
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-{:membrane_element_udp, "~> 0.5.1"}
+{:membrane_element_udp, "~> 0.6.0"}
 ```
 
 ## Usage example
@@ -116,7 +116,7 @@ The deps required to run the example:
 defp deps do
   [
     {:membrane_core, "~> 0.4.1"},
-    {:membrane_element_udp, "~> 0.2"},
+    {:membrane_element_udp, "~> 0.6.0"}
     {:membrane_element_hackney, "~> 0.2"},
     {:membrane_element_file, "~> 0.2"}
   ]

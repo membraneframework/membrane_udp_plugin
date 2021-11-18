@@ -1,7 +1,7 @@
 defmodule Membrane.Element.UDP.MixProject do
   use Mix.Project
 
-  @version "0.5.1"
+  @version "0.6.0"
   @github_url "https://github.com/membraneframework/membrane-element-udp"
 
   def project do
@@ -50,7 +50,7 @@ defmodule Membrane.Element.UDP.MixProject do
 
   defp deps do
     [
-      {:membrane_core, "~> 0.7.0"},
+      {:membrane_core, "~> 0.8.0"},
       {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:mockery, "~> 2.3.0", runtime: false}
