@@ -32,7 +32,7 @@ defmodule Membrane.UDP.MixProject do
     [
       main: "readme",
       extras: ["README.md"],
-      formatters: ["HTML"],
+      formatters: ["html"],
       source_ref: "v#{@version}",
       nest_modules_by_prefix: [Membrane.UDP]
     ]
@@ -52,8 +52,8 @@ defmodule Membrane.UDP.MixProject do
   defp deps do
     [
       {:membrane_core, "~> 0.9.0"},
-      {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.1", only: :dev, runtime: false},
       {:mockery, "~> 2.3.0", runtime: false},
       {:credo, "~> 1.5", only: :dev, runtime: false}
     ]
