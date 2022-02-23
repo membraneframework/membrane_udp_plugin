@@ -1,4 +1,4 @@
-defmodule Membrane.Element.UDP.CommonSocketBehaviour do
+defmodule Membrane.UDP.CommonSocketBehaviour do
   @moduledoc false
 
   import Mockery.Macro
@@ -6,7 +6,7 @@ defmodule Membrane.Element.UDP.CommonSocketBehaviour do
   alias Membrane.Element
   alias Membrane.Element.Base
   alias Membrane.Element.CallbackContext.PlaybackChange
-  alias Membrane.Element.UDP.Socket
+  alias Membrane.UDP.Socket
 
   @spec handle_stopped_to_prepared(
           context :: PlaybackChange.t(),

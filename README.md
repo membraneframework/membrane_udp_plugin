@@ -1,17 +1,17 @@
-# Membrane Multimedia Framework: UDP Element
+# Membrane UDP plugin
 
-[![Hex.pm](https://img.shields.io/hexpm/v/membrane_element_udp.svg)](https://hex.pm/packages/membrane_element_udp)
-[![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/membrane_element_udp/)
-[![CircleCI](https://circleci.com/gh/membraneframework/membrane-element-udp.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane-element-udp)
+[![Hex.pm](https://img.shields.io/hexpm/v/membrane_udp_plugin.svg)](https://hex.pm/packages/membrane_udp_plugin)
+[![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/membrane_udp_plugin/)
+[![CircleCI](https://circleci.com/gh/membraneframework/membrane_udp_plugin.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane_udp_plugin)
 
-This package provides elements that can be used to read from and write to UDP sockets.
+This package provides UDP Source and Sink, that read and write to UDP sockets.
 
 ## Installation
 
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-{:membrane_element_udp, "~> 0.6.0"}
+{:membrane_udp_plugin, "~> 0.6.0"}
 ```
 
 ## Usage example
@@ -23,7 +23,7 @@ sends it over UDP socket via localhost:
 defmodule UDPDemo.Send do
   use Membrane.Pipeline
 
-  alias Membrane.Element.{Hackney, UDP}
+  alias Membrane.{Hackney, UDP}
   alias Membrane.Pipeline.Spec
 
   def handle_init(_) do
@@ -52,8 +52,8 @@ The `UDPDemo.Receive` retrieves packets from UDP socket and
 saves the data to the `/tmp/udp-recv.h264` file.
 
 Bear in mind that for other files/sending pipelines you may need do adjust
-[`recv_buffer_size`](https://hexdocs.pm/membrane_element_udp/Membrane.Element.UDP.Source.html#module-element-options)
-option in `Membrane.Element.UDP.Source` that determines the maximum size of received packets.
+[`recv_buffer_size`](https://hexdocs.pm/membrane_udp_plugin/Membrane.UDP.Source.html#module-element-options)
+option in `Membrane.UDP.Source` that determines the maximum size of received packets.
 
 ```elixir
 defmodule UDPDemo.Receive do
@@ -115,18 +115,18 @@ The deps required to run the example:
 ```elixir
 defp deps do
   [
-    {:membrane_core, "~> 0.4.1"},
-    {:membrane_element_udp, "~> 0.6.0"}
-    {:membrane_element_hackney, "~> 0.2"},
-    {:membrane_element_file, "~> 0.2"}
+    {:membrane_core, "~> 0.9.0"},
+    {:membrane_udp_plugin, "~> 0.7.0"}
+    {:membrane_hackney_plugin, "~> 0.6"},
+    {:membrane_file_plugin, "~> 0.9"}
   ]
 end
 ```
 
 ## Copyright and License
 
-Copyright 2019, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane-element-udp)
+Copyright 2019, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane)
 
-[![Software Mansion](https://logo.swmansion.com/logo?color=white&variant=desktop&width=200&tag=membrane-github)](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane-element-udp)
+[![Software Mansion](https://logo.swmansion.com/logo?color=white&variant=desktop&width=200&tag=membrane-github)](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane)
 
 Licensed under the [Apache License, Version 2.0](LICENSE)

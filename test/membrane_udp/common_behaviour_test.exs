@@ -1,8 +1,8 @@
-defmodule Membrane.Element.UDP.CommonBehaviourTest do
+defmodule Membrane.UDP.CommonBehaviourTest do
   use ExUnit.Case
   use Mockery
 
-  alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket, SocketFactory}
+  alias Membrane.UDP.{CommonSocketBehaviour, Socket, SocketFactory}
 
   describe "CommonBehaviour" do
     test "opens socket when transitioning from stopped to prepared" do

@@ -1,9 +1,9 @@
-defmodule Membrane.Element.UDP.SinkPipelineTest do
+defmodule Membrane.UDP.SinkPipelineTest do
   use ExUnit.Case, async: false
 
   import SocketSetup
 
-  alias Membrane.Element.UDP.{Sink, SocketFactory}
+  alias Membrane.UDP.{Sink, SocketFactory}
   alias Membrane.Testing.{Pipeline, Source}
 
   @local_address SocketFactory.local_address()
@@ -11,7 +11,7 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
   @destination_port_no 5015
   @values 1..100
 
-  def setup_state(_ctx) do
+  defp setup_state(_ctx) do
     open_local_socket = SocketFactory.local_socket(@destination_port_no)
 
     %{state: %{local_socket: open_local_socket}}
@@ -42,5 +42,7 @@ defmodule Membrane.Element.UDP.SinkPipelineTest do
       expected_value = to_string(elem)
       assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}, 1000
     end)
+
+    Pipeline.stop_and_terminate(pipeline, blocking?: true)
   end
 end

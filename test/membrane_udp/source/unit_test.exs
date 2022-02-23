@@ -1,7 +1,7 @@
-defmodule Membrane.Element.UDP.SourceTest do
+defmodule Membrane.UDP.SourceTest do
   use ExUnit.Case
 
-  alias Membrane.Element.UDP.Source
+  alias Membrane.UDP.Source
 
   test "parses udp message" do
     example_binary_payload = "Hi there, I am binary"

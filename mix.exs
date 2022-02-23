@@ -1,18 +1,18 @@
-defmodule Membrane.Element.UDP.MixProject do
+defmodule Membrane.UDP.MixProject do
   use Mix.Project
 
-  @version "0.6.0"
-  @github_url "https://github.com/membraneframework/membrane-element-udp"
+  @version "0.7.0"
+  @github_url "https://github.com/membraneframework/membrane_udp_plugin"
 
   def project do
     [
-      app: :membrane_element_udp,
+      app: :membrane_udp_plugin,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
-      description: "Membrane Multimedia Framework (UDP Element)",
+      description: "Membrane UDP plugin",
       package: package(),
-      name: "Membrane Element: UDP",
+      name: "Membrane UDP plugin",
       source_url: @github_url,
       docs: docs(),
       deps: deps()
@@ -26,21 +26,22 @@ defmodule Membrane.Element.UDP.MixProject do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(_env), do: ["lib"]
 
   defp docs do
     [
       main: "readme",
-      extras: ["README.md"],
+      extras: ["README.md", LICENSE: [title: "License"]],
+      formatters: ["html"],
       source_ref: "v#{@version}",
-      nest_modules_by_prefix: [Membrane.Element.UDP]
+      nest_modules_by_prefix: [Membrane.UDP]
     ]
   end
 
   defp package do
     [
       maintainers: ["Membrane Team"],
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @github_url,
         "Membrane Framework Homepage" => "https://membraneframework.org"
@@ -50,10 +51,11 @@ defmodule Membrane.Element.UDP.MixProject do
 
   defp deps do
     [
-      {:membrane_core, "~> 0.8.0"},
-      {:ex_doc, "~> 0.21", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
-      {:mockery, "~> 2.3.0", runtime: false}
+      {:membrane_core, "~> 0.9.0"},
+      {:mockery, "~> 2.3.0", runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.1", only: :dev, runtime: false},
+      {:credo, "~> 1.5", only: :dev, runtime: false}
     ]
   end
 end

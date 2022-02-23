@@ -1,4 +1,4 @@
-defmodule Membrane.Element.UDP.Socket do
+defmodule Membrane.UDP.Socket do
   @moduledoc false
 
   @enforce_keys [:port_no, :ip_address]
