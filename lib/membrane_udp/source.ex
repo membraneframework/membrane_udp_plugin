@@ -1,11 +1,11 @@
-defmodule Membrane.Element.UDP.Source do
+defmodule Membrane.UDP.Source do
   @moduledoc """
   Element that reads packets from a UDP socket and sends their payloads through the output pad.
   """
   use Membrane.Source
 
   alias Membrane.{Buffer, RemoteStream}
-  alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}
+  alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
   def_options local_port_no: [
                 type: :integer,

@@ -1,9 +1,9 @@
-defmodule Membrane.Element.UDP.SinkUnitTest do
+defmodule Membrane.UDP.SinkUnitTest do
   use ExUnit.Case
   use Mockery
 
   alias Membrane.Buffer
-  alias Membrane.Element.UDP.{Sink, Socket, SocketFactory}
+  alias Membrane.UDP.{Sink, Socket, SocketFactory}
 
   describe "Sink element" do
     test "handle_write/4 calls send and demands more data" do

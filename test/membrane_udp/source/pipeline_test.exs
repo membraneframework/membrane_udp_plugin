@@ -1,14 +1,14 @@
-defmodule Membrane.Element.UDP.SourcePipelineTest do
+defmodule Membrane.UDP.SourcePipelineTest do
   use ExUnit.Case, async: false
 
   import Membrane.Testing.Assertions
 
-  alias Membrane.Element.UDP.{SocketFactory, Source}
+  alias Membrane.UDP.{SocketFactory, Source}
   alias Membrane.Testing.{Pipeline, Sink}
 
   @local_address {127, 0, 0, 1}
-  @local_port_no 5050
-  @destination_port_no 5051
+  @local_port_no 5052
+  @destination_port_no 5053
   @values 1..100
 
   test "100 messages passes through pipeline" do
@@ -51,5 +51,7 @@ defmodule Membrane.Element.UDP.SourcePipelineTest do
         2000
       )
     end)
+
+    Pipeline.stop_and_terminate(pipeline, blocking?: true)
   end
 end

@@ -1,11 +1,11 @@
-defmodule Membrane.Element.UDP.IntegrationTest do
+defmodule Membrane.UDP.IntegrationTest do
   use ExUnit.Case, async: false
 
   import Membrane.Testing.Assertions
 
   alias Membrane.{Buffer, Testing}
   alias Membrane.Testing.Pipeline
-  alias Membrane.Element.UDP
+  alias Membrane.UDP
 
   @target_port 5000
   @localhostv4 {127, 0, 0, 1}
@@ -53,5 +53,8 @@ defmodule Membrane.Element.UDP.IntegrationTest do
       payload = inspect(x)
       assert_sink_buffer(receiver, :sink, %Buffer{payload: ^payload})
     end)
+
+    Pipeline.stop_and_terminate(sender, blocking?: true)
+    Pipeline.stop_and_terminate(receiver, blocking?: true)
   end
 end

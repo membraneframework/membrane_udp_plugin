@@ -1,4 +1,4 @@
-defmodule Membrane.Element.UDP.Sink do
+defmodule Membrane.UDP.Sink do
   @moduledoc """
   Element that sends buffers received on the input pad over a UDP socket.
   """
@@ -7,7 +7,7 @@ defmodule Membrane.Element.UDP.Sink do
   import Mockery.Macro
 
   alias Membrane.Buffer
-  alias Membrane.Element.UDP.{CommonSocketBehaviour, Socket}
+  alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
   def_options destination_address: [
                 type: :ip_address,

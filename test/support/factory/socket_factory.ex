@@ -1,7 +1,7 @@
-defmodule Membrane.Element.UDP.SocketFactory do
+defmodule Membrane.UDP.SocketFactory do
   @moduledoc false
 
-  alias Membrane.Element.UDP.Socket
+  alias Membrane.UDP.Socket
 
   @local {127, 0, 0, 1}
 

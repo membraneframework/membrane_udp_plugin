@@ -1,16 +1,16 @@
-defmodule Membrane.Element.UDP.SinkIntegrationTest do
+defmodule Membrane.UDP.SinkIntegrationTest do
   use ExUnit.Case, async: false
 
   import SocketSetup
 
   alias Membrane.Buffer
-  alias Membrane.Element.UDP.{Sink, SocketFactory}
+  alias Membrane.UDP.{Sink, SocketFactory}
 
   @destination_port_no 5001
   @local_port_no 5000
   @local_address SocketFactory.local_address()
 
-  def setup_state(_ctx) do
+  defp setup_state(_ctx) do
     dst_socket = SocketFactory.local_socket(@destination_port_no)
     local_socket = SocketFactory.local_socket(@local_port_no)
 
