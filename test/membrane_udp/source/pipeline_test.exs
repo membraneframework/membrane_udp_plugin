@@ -26,8 +26,6 @@ defmodule Membrane.UDP.SourcePipelineTest do
                test_process: self()
              })
 
-    Pipeline.play(pipeline)
-
     assert_pipeline_playback_changed(pipeline, :prepared, :playing)
 
     Enum.map(data, fn elem ->
@@ -52,6 +50,6 @@ defmodule Membrane.UDP.SourcePipelineTest do
       )
     end)
 
-    Pipeline.stop_and_terminate(pipeline, blocking?: true)
+    Pipeline.terminate(pipeline, blocking?: true)
   end
 end
