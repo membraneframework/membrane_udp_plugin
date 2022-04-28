@@ -36,13 +36,11 @@ defmodule Membrane.UDP.SinkPipelineTest do
                ]
              })
 
-    assert :ok == Pipeline.play(pipeline)
-
     Enum.each(@values, fn elem ->
       expected_value = to_string(elem)
       assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}, 1000
     end)
 
-    Pipeline.stop_and_terminate(pipeline, blocking?: true)
+    Pipeline.terminate(pipeline, blocking?: true)
   end
 end
