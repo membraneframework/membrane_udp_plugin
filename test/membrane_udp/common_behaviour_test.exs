@@ -14,8 +14,8 @@ defmodule Membrane.UDP.CommonBehaviourTest do
 
       state = %{local_socket: socket}
 
-      assert {{:ok, _actions}, %{local_socket: result_socket}} =
-               CommonSocketBehaviour.handle_stopped_to_prepared(nil, state)
+      assert {_actions, %{local_socket: result_socket}} =
+               CommonSocketBehaviour.handle_setup(nil, state)
 
       assert result_socket.socket_handle == self()
       assert_called(Socket, :open)
@@ -26,8 +26,8 @@ defmodule Membrane.UDP.CommonBehaviourTest do
     socket = %Socket{port_no: 123, ip_address: {127, 0, 0, 1}, socket_handle: :i_am_socket}
     mock(Socket, [close: 1], %Socket{socket | socket_handle: nil})
 
-    assert {:ok, %{local_socket: %Socket{socket_handle: nil}}} =
-             CommonSocketBehaviour.handle_prepared_to_stopped(nil, %{local_socket: socket})
+    assert {[terminate: :normal], %{local_socket: %Socket{socket_handle: nil}}} =
+             CommonSocketBehaviour.handle_terminate_request(nil, %{local_socket: socket})
 
     assert_called(Socket, close: 1)
   end

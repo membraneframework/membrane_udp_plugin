@@ -2,6 +2,7 @@ defmodule Membrane.UDP.SourcePipelineTest do
   use ExUnit.Case, async: false
 
   import Membrane.Testing.Assertions
+  import Membrane.ChildrenSpec
 
   alias Membrane.UDP.{SocketFactory, Source}
   alias Membrane.Testing.{Pipeline, Sink}
@@ -10,23 +11,24 @@ defmodule Membrane.UDP.SourcePipelineTest do
   @local_port_no 5052
   @destination_port_no 5053
   @values 1..100
+  @timeout 2_000
 
   test "100 messages passes through pipeline" do
     data = @values |> Enum.map(&to_string(&1))
 
-    assert {:ok, pipeline} =
-             Pipeline.start_link(%Pipeline.Options{
-               elements: [
-                 udp_source: %Source{
+    assert pipeline =
+             Pipeline.start_link_supervised!(
+               structure: [
+                 child(:udp_source, %Source{
                    local_address: SocketFactory.local_address(),
                    local_port_no: @destination_port_no
-                 },
-                 sink: %Sink{}
+                 })
+                 |> child(:sink, %Sink{})
                ],
                test_process: self()
-             })
+             )
 
-    assert_pipeline_playback_changed(pipeline, :prepared, :playing)
+    assert_pipeline_play(pipeline)
 
     Enum.map(data, fn elem ->
       udp_like_message = {:udp, nil, @local_address, @local_port_no, elem}
@@ -46,7 +48,7 @@ defmodule Membrane.UDP.SourcePipelineTest do
           },
           payload: ^expected_value
         },
-        2000
+        @timeout
       )
     end)
 
