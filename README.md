@@ -103,8 +103,8 @@ assert_pipeline_play(receiver)
 
 assert_end_of_stream(sender, :udp, :input, 5000)
 
-:ok = Pipeline.stop(sender)
-:ok = Pipeline.stop(receiver)
+:ok = Pipeline.terminate(sender, blocking?: true)
+:ok = Pipeline.terminate(receiver, blocking?: true)
 ```
 
 The deps required to run the example:

@@ -9,37 +9,34 @@ defmodule Membrane.UDP.Sink do
   alias Membrane.Buffer
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
-  def_options(
-    destination_address: [
-      spec: :inet.ip_address(),
-      description: "An IP Address that the packets will be sent to."
-    ],
-    destination_port_no: [
-      spec: :inet.port_number(),
-      description: "A UDP port number of a target."
-    ],
-    local_address: [
-      spec: :inet.socket_address(),
-      default: :any,
-      description: """
-      An IP Address set for a UDP socket used to sent packets. It allows to specify which
-      network interface to use if there's more than one.
-      """
-    ],
-    local_port_no: [
-      spec: :inet.port_number(),
-      default: 0,
-      description: """
-      A UDP port number for the socket used to sent packets. If set to `0` (default)
-      the underlying OS will assign a free UDP port.
-      """
-    ]
-  )
+  def_options destination_address: [
+                spec: :inet.ip_address(),
+                description: "An IP Address that the packets will be sent to."
+              ],
+              destination_port_no: [
+                spec: :inet.port_number(),
+                description: "A UDP port number of a target."
+              ],
+              local_address: [
+                spec: :inet.socket_address(),
+                default: :any,
+                description: """
+                An IP Address set for a UDP socket used to sent packets. It allows to specify which
+                network interface to use if there's more than one.
+                """
+              ],
+              local_port_no: [
+                spec: :inet.port_number(),
+                default: 0,
+                description: """
+                A UDP port number for the socket used to sent packets. If set to `0` (default)
+                the underlying OS will assign a free UDP port.
+                """
+              ]
 
-  def_input_pad(:input,
+  def_input_pad :input,
     accepted_format: _any,
     demand_unit: :buffers
-  )
 
   # Private API
 
@@ -77,13 +74,10 @@ defmodule Membrane.UDP.Sink do
 
     case mockable(Socket).send(dst_socket, local_socket, payload) do
       :ok -> {[demand: :input], state}
-      {:error, cause} -> raise "Error: #{inspect(cause)}"
+      {:error, cause} -> raise "Error sending UDP packet, reason: #{inspect(cause)}"
     end
   end
 
   @impl true
   defdelegate handle_setup(context, state), to: CommonSocketBehaviour
-
-  @impl true
-  defdelegate handle_terminate_request(context, state), to: CommonSocketBehaviour
 end

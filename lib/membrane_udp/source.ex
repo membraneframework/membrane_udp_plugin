@@ -85,7 +85,4 @@ defmodule Membrane.UDP.Source do
 
   @impl true
   defdelegate handle_setup(context, state), to: CommonSocketBehaviour
-
-  @impl true
-  defdelegate handle_terminate_request(context, state), to: CommonSocketBehaviour
 end
