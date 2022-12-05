@@ -7,30 +7,28 @@ defmodule Membrane.UDP.Source do
   alias Membrane.{Buffer, RemoteStream}
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
-  def_options(
-    local_port_no: [
-      spec: pos_integer,
-      default: 5000,
-      description: "A UDP port number used when opening a receiving socket."
-    ],
-    local_address: [
-      spec: :inet.socket_address(),
-      default: :any,
-      description: """
-      An IP Address on which the socket will listen. It allows to choose which
-      network interface to use if there's more than one.
-      """
-    ],
-    recv_buffer_size: [
-      spec: pos_integer,
-      default: 16_384,
-      description: """
-      Size of the receive buffer. Packages of size greater than this buffer will be truncated
-      """
-    ]
-  )
+  def_options local_port_no: [
+                spec: pos_integer,
+                default: 5000,
+                description: "A UDP port number used when opening a receiving socket."
+              ],
+              local_address: [
+                spec: :inet.socket_address(),
+                default: :any,
+                description: """
+                An IP Address on which the socket will listen. It allows to choose which
+                network interface to use if there's more than one.
+                """
+              ],
+              recv_buffer_size: [
+                spec: pos_integer,
+                default: 16_384,
+                description: """
+                Size of the receive buffer. Packages of size greater than this buffer will be truncated
+                """
+              ]
 
-  def_output_pad(:output, accepted_format: %RemoteStream{type: :packetized}, mode: :push)
+  def_output_pad :output, accepted_format: %RemoteStream{type: :packetized}, mode: :push
 
   @impl true
   def handle_init(_context, %__MODULE__{} = opts) do
