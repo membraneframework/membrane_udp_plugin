@@ -19,7 +19,7 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
 
         Membrane.ResourceGuard.register(
           ctx.resource_guard,
-          fn -> close_socket(state) end,
+          fn -> close_socket(local_socket) end,
           tag: :udp_guard
         )
 
@@ -30,7 +30,7 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
     end
   end
 
-  defp close_socket(%{local_socket: %Socket{} = local_socket}) do
+  defp close_socket(%Socket{} = local_socket) do
     mockable(Socket).close(local_socket)
   end
 end
