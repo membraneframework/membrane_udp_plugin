@@ -11,7 +11,7 @@ This package provides UDP Source and Sink, that read and write to UDP sockets.
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-	{:membrane_udp_plugin, "~> 0.8.0"}
+	{:membrane_udp_plugin, "~> 0.9.0"}
 ```
 
 ## Usage example
@@ -43,7 +43,7 @@ defmodule UDPDemo.Send do
     }
 
     spec = %Spec{children: children, links: links}
-    {{:ok, spec: spec}, %{}}
+    {[spec: spec], %{}}
   end
 end
 ```
@@ -78,7 +78,7 @@ defmodule UDPDemo.Receive do
     }
 
     spec = %Spec{children: children, links: links}
-    {{:ok, spec: spec}, %{}}
+    {[spec: spec], %{}}
   end
 end
 ```
@@ -92,22 +92,19 @@ after everything has been sent.
 alias Membrane.Testing.Pipeline
 import Membrane.Testing.Assertions
 
-{:ok, sender} = Pipeline.start_link(%Pipeline.Options{module: UDPDemo.Send})
-{:ok, receiver} = Pipeline.start_link(%Pipeline.Options{module: UDPDemo.Receive})
+sender = Pipeline.start_link_supervised!(%Pipeline.Options{module: UDPDemo.Send})
+receiver = Pipeline.start_link_supervised!(%Pipeline.Options{module: UDPDemo.Receive})
 
 :ok = Pipeline.play(receiver)
 
-assert_pipeline_playback_changed(receiver, :prepared, :playing)
+assert_pipeline_play(receiver)
 
 :ok = Pipeline.play(sender)
 
 assert_end_of_stream(sender, :udp, :input, 5000)
 
-:ok = Pipeline.stop(sender)
-assert_pipeline_playback_changed(sender, :prepared, :stopped)
-
-:ok = Pipeline.stop(receiver)
-assert_pipeline_playback_changed(receiver, :prepared, :stopped)
+:ok = Pipeline.terminate(sender, blocking?: true)
+:ok = Pipeline.terminate(receiver, blocking?: true)
 ```
 
 The deps required to run the example:

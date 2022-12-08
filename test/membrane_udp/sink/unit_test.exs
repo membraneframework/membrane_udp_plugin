@@ -18,13 +18,13 @@ defmodule Membrane.UDP.SinkUnitTest do
       }
 
       assert Sink.handle_write(:input, %Buffer{payload: payload_data}, nil, state) ==
-               {{:ok, demand: :input}, state}
+               {[demand: :input], state}
 
       assert_called(Socket, :send, [^dst_socket, ^local_socket, ^payload_data])
     end
 
     test "demands data when starting to play" do
-      assert {{:ok, commands}, nil} = Sink.handle_prepared_to_playing(nil, nil)
+      assert {commands, nil} = Sink.handle_playing(nil, nil)
 
       assert Keyword.fetch(commands, :demand) == {:ok, :input}
     end

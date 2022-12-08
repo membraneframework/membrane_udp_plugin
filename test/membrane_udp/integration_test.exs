@@ -2,6 +2,7 @@ defmodule Membrane.UDP.IntegrationTest do
   use ExUnit.Case, async: false
 
   import Membrane.Testing.Assertions
+  import Membrane.ChildrenSpec
 
   alias Membrane.{Buffer, Testing}
   alias Membrane.Testing.Pipeline
@@ -15,25 +16,30 @@ defmodule Membrane.UDP.IntegrationTest do
   test "send and receive using 2 pipelines" do
     payload = 1..@payload_frames |> Enum.map(&inspect/1)
 
-    {:ok, receiver} =
-      Pipeline.start_link(%Pipeline.Options{
-        elements: [
-          source: %UDP.Source{local_port_no: @target_port, local_address: @localhostv4},
-          sink: %Testing.Sink{}
+    receiver =
+      Pipeline.start_link_supervised!(
+        structure: [
+          child(:source, %UDP.Source{local_port_no: @target_port, local_address: @localhostv4})
+          |> child(:sink, %Testing.Sink{})
         ]
-      })
+      )
 
     assert_pipeline_notified(receiver, :source, {:connection_info, @localhostv4, @target_port})
 
-    assert_pipeline_playback_changed(receiver, :prepared, :playing)
+    assert_pipeline_play(receiver)
 
-    {:ok, sender} =
-      Pipeline.start_link(%Pipeline.Options{
-        elements: [
-          source: %Testing.Source{output: payload},
-          sink: %UDP.Sink{destination_port_no: @target_port, destination_address: @localhostv4}
+    sender =
+      Pipeline.start_link_supervised!(
+        structure: [
+          child(:source, %Testing.Source{output: payload})
+          |> child(:sink, %UDP.Sink{
+            destination_port_no: @target_port,
+            destination_address: @localhostv4
+          })
         ]
-      })
+      )
+
+    assert_pipeline_play(sender)
 
     assert_pipeline_notified(
       sender,

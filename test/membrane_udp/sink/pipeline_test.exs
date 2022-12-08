@@ -2,6 +2,7 @@ defmodule Membrane.UDP.SinkPipelineTest do
   use ExUnit.Case, async: false
 
   import SocketSetup
+  import Membrane.ChildrenSpec
 
   alias Membrane.UDP.{Sink, SocketFactory}
   alias Membrane.Testing.{Pipeline, Source}
@@ -23,18 +24,18 @@ defmodule Membrane.UDP.SinkPipelineTest do
   test "100 messages passes through pipeline" do
     data = @values |> Enum.map(&to_string(&1))
 
-    assert {:ok, pipeline} =
-             Pipeline.start_link(%Pipeline.Options{
-               elements: [
-                 test_source: %Source{output: data},
-                 udp_sink: %Sink{
+    assert pipeline =
+             Pipeline.start_link_supervised!(
+               structure: [
+                 child(:test_source, %Source{output: data})
+                 |> child(:udp_sink, %Sink{
                    destination_address: SocketFactory.local_address(),
                    destination_port_no: @destination_port_no,
                    local_address: SocketFactory.local_address(),
                    local_port_no: @local_port_no
-                 }
+                 })
                ]
-             })
+             )
 
     Enum.each(@values, fn elem ->
       expected_value = to_string(elem)
