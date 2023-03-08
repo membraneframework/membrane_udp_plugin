@@ -19,7 +19,7 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
 
         Membrane.ResourceGuard.register(
           ctx.resource_guard,
-          fn -> close_socket(local_socket) end,
+          fn -> close_socket(socket) end,
           tag: :udp_guard
         )
 

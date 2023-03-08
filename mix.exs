@@ -1,7 +1,7 @@
 defmodule Membrane.UDP.MixProject do
   use Mix.Project
 
-  @version "0.9.0"
+  @version "0.9.1"
   @github_url "https://github.com/membraneframework/membrane_udp_plugin"
 
   def project do
@@ -45,7 +45,7 @@ defmodule Membrane.UDP.MixProject do
       licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @github_url,
-        "Membrane Framework Homepage" => "https://membraneframework.org"
+        "Membrane Framework Homepage" => "https://membrane.stream"
       }
     ]
   end
