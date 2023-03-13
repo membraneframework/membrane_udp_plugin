@@ -30,7 +30,8 @@ defmodule Membrane.UDP.CommonBehaviourTest do
       # socket down
       mock(Socket, [close: 1], %Socket{socket | socket_handle: nil})
       close_socket.()
-      assert_called(Socket, close: 1)
+      self_pid = self()
+      assert_called(Socket, :close, [%{socket_handle: ^self_pid}])
     end
   end
 end
