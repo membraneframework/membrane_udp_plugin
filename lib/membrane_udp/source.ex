@@ -8,7 +8,7 @@ defmodule Membrane.UDP.Source do
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
   def_options local_port_no: [
-                spec: pos_integer,
+                spec: pos_integer(),
                 default: 5000,
                 description: "A UDP port number used when opening a receiving socket."
               ],
@@ -21,10 +21,32 @@ defmodule Membrane.UDP.Source do
                 """
               ],
               recv_buffer_size: [
-                spec: pos_integer,
+                spec: pos_integer(),
                 default: 16_384,
                 description: """
                 Size of the receive buffer. Packages of size greater than this buffer will be truncated
+                """
+              ],
+              pierce_nat_ctx: [
+                spec:
+                  %{
+                    uri: URI.t(),
+                    address: :inet.ip_address(),
+                    port: pos_integer()
+                  }
+                  | nil,
+                default: nil,
+                description: """
+                Context necessary to make an attempt to create client-side NAT binding
+                by sending an empty datagram from the `#{inspect(__MODULE__)}` to an arbitrary host.
+
+                * If left as `nil`, no attempt will ever be made.
+                * If filled in, whenever the pipeline switches playback to `:playing`,
+                one datagram (with an empty payload) will be sent from the opened socket
+                to the `:port` at `:address` provided via this option.
+                If `:address` is not present, it will be parsed from `:uri`.
+
+                Disclaimer: This is a potential vulnerability. Use with caution.
                 """
               ]
 
@@ -38,12 +60,24 @@ defmodule Membrane.UDP.Source do
       sock_opts: [recbuf: opts.recv_buffer_size]
     }
 
-    {[], %{local_socket: socket}}
+    {[], %{local_socket: socket, pierce_nat_ctx: opts.pierce_nat_ctx}}
   end
 
   @impl true
-  def handle_playing(_ctx, state) do
-    {[stream_format: {:output, %RemoteStream{type: :packetized}}], state}
+  def handle_playing(_ctx, %{pierce_nat_ctx: nat_ctx} = state) do
+    nat_ctx =
+      if not is_nil(nat_ctx) do
+        ip =
+          if is_nil(Map.get(nat_ctx, :address)),
+            do: parse_address(nat_ctx.uri),
+            else: nat_ctx.address
+
+        Socket.send(%Socket{ip_address: ip, port_no: nat_ctx.port}, state.local_socket, <<>>)
+        Map.put(nat_ctx, :address, ip)
+      end
+
+    {[stream_format: {:output, %RemoteStream{type: :packetized}}],
+     %{state | pierce_nat_ctx: nat_ctx}}
   end
 
   @impl true
@@ -83,4 +117,18 @@ defmodule Membrane.UDP.Source do
 
   @impl true
   defdelegate handle_setup(context, state), to: CommonSocketBehaviour
+
+  defp parse_address(uri) do
+    hostname =
+      URI.parse(uri)
+      |> Map.get(:host)
+      |> to_charlist()
+
+    Enum.find_value([:inet, :inet6, :local], fn addr_family ->
+      case :inet.getaddr(hostname, addr_family) do
+        {:ok, address} -> address
+        {:error, _reason} -> false
+      end
+    end)
+  end
 end
