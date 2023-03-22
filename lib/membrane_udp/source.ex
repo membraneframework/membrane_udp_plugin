@@ -64,17 +64,20 @@ defmodule Membrane.UDP.Source do
   end
 
   @impl true
-  def handle_playing(_ctx, %{pierce_nat_ctx: nat_ctx} = state) do
-    nat_ctx =
-      if not is_nil(nat_ctx) do
-        ip =
-          if is_nil(Map.get(nat_ctx, :address)),
-            do: parse_address(nat_ctx.uri),
-            else: nat_ctx.address
+  def handle_playing(_ctx, %{pierce_nat_ctx: nil} = state) do
+    {[stream_format: {:output, %RemoteStream{type: :packetized}}], state}
+  end
 
-        Socket.send(%Socket{ip_address: ip, port_no: nat_ctx.port}, state.local_socket, <<>>)
-        Map.put(nat_ctx, :address, ip)
-      end
+  @impl true
+  def handle_playing(_ctx, %{pierce_nat_ctx: nat_ctx} = state) do
+    ip =
+      if is_nil(Map.get(nat_ctx, :address)),
+        do: parse_address(nat_ctx.uri),
+        else: nat_ctx.address
+
+    nat_ctx = Map.put(nat_ctx, :address, ip)
+
+    Socket.send(%Socket{ip_address: ip, port_no: nat_ctx.port}, state.local_socket, <<>>)
 
     {[stream_format: {:output, %RemoteStream{type: :packetized}}],
      %{state | pierce_nat_ctx: nat_ctx}}
