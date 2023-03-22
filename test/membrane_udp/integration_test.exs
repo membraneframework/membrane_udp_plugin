@@ -9,6 +9,7 @@ defmodule Membrane.UDP.IntegrationTest do
   alias Membrane.UDP
 
   @target_port 5000
+  @server_port 6789
   @localhostv4 {127, 0, 0, 1}
 
   @payload_frames 50
@@ -57,5 +58,32 @@ defmodule Membrane.UDP.IntegrationTest do
 
     Pipeline.terminate(sender, blocking?: true)
     Pipeline.terminate(receiver, blocking?: true)
+  end
+
+  test "NAT pierce datagram comes through" do
+    {:ok, server_sock} =
+      UDP.Socket.open(%UDP.Socket{port_no: @server_port, ip_address: @localhostv4})
+
+    client =
+      Pipeline.start_link_supervised!(
+        structure: [
+          child(:source, %UDP.Source{
+            local_port_no: @target_port,
+            local_address: @localhostv4,
+            pierce_nat_ctx: %{
+              address: @localhostv4,
+              port: @server_port
+            }
+          })
+          |> child(:sink, %Testing.Sink{})
+        ]
+      )
+
+    assert_pipeline_notified(client, :source, {:connection_info, @localhostv4, @target_port})
+
+    assert_pipeline_play(client)
+
+    handle = server_sock.socket_handle
+    assert_receive({:udp, ^handle, @localhostv4, @target_port, <<>>}, 20_000)
   end
 end
