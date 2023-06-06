@@ -11,7 +11,7 @@ This package provides UDP Source and Sink, that read and write to UDP sockets.
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-	{:membrane_udp_plugin, "~> 0.9.2"}
+	{:membrane_udp_plugin, "~> 0.10.0"}
 ```
 
 ## Usage example
@@ -113,7 +113,7 @@ The deps required to run the example:
 defp deps do
   [
     {:membrane_core, "~> 0.9.0"},
-	{:membrane_udp_plugin, "~> 0.8.0"}
+	{:membrane_udp_plugin, "~> 0.10.0"}
     {:membrane_hackney_plugin, "~> 0.6"},
     {:membrane_file_plugin, "~> 0.9"}
   ]
