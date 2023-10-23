@@ -22,7 +22,7 @@ defmodule Membrane.UDP.Source do
               ],
               recv_buffer_size: [
                 spec: pos_integer(),
-                default: 16_384,
+                default: 1024 * 1024,
                 description: """
                 Size of the receive buffer. Packages of size greater than this buffer will be truncated
                 """
