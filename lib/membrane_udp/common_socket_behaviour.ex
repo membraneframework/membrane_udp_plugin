@@ -5,13 +5,13 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
 
   alias Membrane.Element
   alias Membrane.Element.Base
-  alias Membrane.Element.CallbackContext.Setup
+  alias Membrane.Element.CallbackContext
   alias Membrane.UDP.Socket
 
   @spec handle_setup(
-          context :: Setup.t(),
-          state :: Element.state_t()
-        ) :: Base.callback_return_t()
+          context :: CallbackContext.t(),
+          state :: Element.state()
+        ) :: Base.callback_return()
   def handle_setup(ctx, %{local_socket: %Socket{} = local_socket} = state) do
     case mockable(Socket).open(local_socket) do
       {:ok, socket} ->
