@@ -50,7 +50,7 @@ defmodule Membrane.UDP.Source do
                 """
               ]
 
-  def_output_pad :output, accepted_format: %RemoteStream{type: :packetized}, mode: :push
+  def_output_pad :output, accepted_format: %RemoteStream{type: :packetized}, flow_control: :push
 
   @impl true
   def handle_init(_context, %__MODULE__{} = opts) do

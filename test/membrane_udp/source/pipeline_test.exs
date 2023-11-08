@@ -18,7 +18,7 @@ defmodule Membrane.UDP.SourcePipelineTest do
 
     assert pipeline =
              Pipeline.start_link_supervised!(
-               structure: [
+               spec: [
                  child(:udp_source, %Source{
                    local_address: SocketFactory.local_address(),
                    local_port_no: @destination_port_no
@@ -28,7 +28,8 @@ defmodule Membrane.UDP.SourcePipelineTest do
                test_process: self()
              )
 
-    assert_pipeline_play(pipeline)
+    # time for a pipeline to enter playing playback
+    Process.sleep(100)
 
     Enum.map(data, fn elem ->
       udp_like_message = {:udp, nil, @local_address, @local_port_no, elem}
@@ -52,6 +53,6 @@ defmodule Membrane.UDP.SourcePipelineTest do
       )
     end)
 
-    Pipeline.terminate(pipeline, blocking?: true)
+    Pipeline.terminate(pipeline)
   end
 end

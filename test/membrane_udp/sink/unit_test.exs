@@ -6,7 +6,7 @@ defmodule Membrane.UDP.SinkUnitTest do
   alias Membrane.UDP.{Sink, Socket, SocketFactory}
 
   describe "Sink element" do
-    test "handle_write/4 calls send and demands more data" do
+    test "handle_buffer/4 calls send and demands more data" do
       mock(Socket, [send: 3], :ok)
       payload_data = "binary data"
       local_socket = SocketFactory.local_socket(1234)
@@ -17,7 +17,7 @@ defmodule Membrane.UDP.SinkUnitTest do
         dst_socket: dst_socket
       }
 
-      assert Sink.handle_write(:input, %Buffer{payload: payload_data}, nil, state) ==
+      assert Sink.handle_buffer(:input, %Buffer{payload: payload_data}, nil, state) ==
                {[demand: :input], state}
 
       assert_called(Socket, :send, [^dst_socket, ^local_socket, ^payload_data])

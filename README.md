@@ -95,16 +95,10 @@ import Membrane.Testing.Assertions
 sender = Pipeline.start_link_supervised!(%Pipeline.Options{module: UDPDemo.Send})
 receiver = Pipeline.start_link_supervised!(%Pipeline.Options{module: UDPDemo.Receive})
 
-:ok = Pipeline.play(receiver)
-
-assert_pipeline_play(receiver)
-
-:ok = Pipeline.play(sender)
-
 assert_end_of_stream(sender, :udp, :input, 5000)
 
-:ok = Pipeline.terminate(sender, blocking?: true)
-:ok = Pipeline.terminate(receiver, blocking?: true)
+:ok = Pipeline.terminate(sender)
+:ok = Pipeline.terminate(receiver)
 ```
 
 The deps required to run the example:

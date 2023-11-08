@@ -19,7 +19,7 @@ defmodule Membrane.UDP.IntegrationTest do
 
     receiver =
       Pipeline.start_link_supervised!(
-        structure: [
+        spec: [
           child(:source, %UDP.Source{local_port_no: @target_port, local_address: @localhostv4})
           |> child(:sink, %Testing.Sink{})
         ]
@@ -27,11 +27,9 @@ defmodule Membrane.UDP.IntegrationTest do
 
     assert_pipeline_notified(receiver, :source, {:connection_info, @localhostv4, @target_port})
 
-    assert_pipeline_play(receiver)
-
     sender =
       Pipeline.start_link_supervised!(
-        structure: [
+        spec: [
           child(:source, %Testing.Source{output: payload})
           |> child(:sink, %UDP.Sink{
             destination_port_no: @target_port,
@@ -39,8 +37,6 @@ defmodule Membrane.UDP.IntegrationTest do
           })
         ]
       )
-
-    assert_pipeline_play(sender)
 
     assert_pipeline_notified(
       sender,
@@ -56,8 +52,8 @@ defmodule Membrane.UDP.IntegrationTest do
       assert_sink_buffer(receiver, :sink, %Buffer{payload: ^payload})
     end)
 
-    Pipeline.terminate(sender, blocking?: true)
-    Pipeline.terminate(receiver, blocking?: true)
+    Pipeline.terminate(sender)
+    Pipeline.terminate(receiver)
   end
 
   test "NAT pierce datagram comes through" do
@@ -66,7 +62,7 @@ defmodule Membrane.UDP.IntegrationTest do
 
     client =
       Pipeline.start_link_supervised!(
-        structure: [
+        spec: [
           child(:source, %UDP.Source{
             local_port_no: @target_port,
             local_address: @localhostv4,
@@ -80,8 +76,6 @@ defmodule Membrane.UDP.IntegrationTest do
       )
 
     assert_pipeline_notified(client, :source, {:connection_info, @localhostv4, @target_port})
-
-    assert_pipeline_play(client)
 
     handle = server_sock.socket_handle
     assert_receive({:udp, ^handle, @localhostv4, @target_port, <<>>}, 20_000)

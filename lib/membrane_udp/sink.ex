@@ -36,6 +36,7 @@ defmodule Membrane.UDP.Sink do
 
   def_input_pad :input,
     accepted_format: _any,
+    flow_control: :manual,
     demand_unit: :buffers
 
   # Private API
@@ -69,7 +70,7 @@ defmodule Membrane.UDP.Sink do
   end
 
   @impl true
-  def handle_write(:input, %Buffer{payload: payload}, _context, state) do
+  def handle_buffer(:input, %Buffer{payload: payload}, _context, state) do
     %{dst_socket: dst_socket, local_socket: local_socket} = state
 
     case mockable(Socket).send(dst_socket, local_socket, payload) do
