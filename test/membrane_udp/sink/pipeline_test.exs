@@ -26,7 +26,7 @@ defmodule Membrane.UDP.SinkPipelineTest do
 
     assert pipeline =
              Pipeline.start_link_supervised!(
-               structure: [
+               spec: [
                  child(:test_source, %Source{output: data})
                  |> child(:udp_sink, %Sink{
                    destination_address: SocketFactory.local_address(),
@@ -42,6 +42,6 @@ defmodule Membrane.UDP.SinkPipelineTest do
       assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}, 1000
     end)
 
-    Pipeline.terminate(pipeline, blocking?: true)
+    Pipeline.terminate(pipeline)
   end
 end

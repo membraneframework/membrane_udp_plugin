@@ -11,7 +11,7 @@ This package provides UDP Source and Sink, that read and write to UDP sockets.
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-	{:membrane_udp_plugin, "~> 0.11.0"}
+	{:membrane_udp_plugin, "~> 0.12.0"}
 ```
 
 ## Usage example
@@ -95,16 +95,10 @@ import Membrane.Testing.Assertions
 sender = Pipeline.start_link_supervised!(%Pipeline.Options{module: UDPDemo.Send})
 receiver = Pipeline.start_link_supervised!(%Pipeline.Options{module: UDPDemo.Receive})
 
-:ok = Pipeline.play(receiver)
-
-assert_pipeline_play(receiver)
-
-:ok = Pipeline.play(sender)
-
 assert_end_of_stream(sender, :udp, :input, 5000)
 
-:ok = Pipeline.terminate(sender, blocking?: true)
-:ok = Pipeline.terminate(receiver, blocking?: true)
+:ok = Pipeline.terminate(sender)
+:ok = Pipeline.terminate(receiver)
 ```
 
 The deps required to run the example:
@@ -113,7 +107,7 @@ The deps required to run the example:
 defp deps do
   [
     {:membrane_core, "~> 0.9.0"},
-	{:membrane_udp_plugin, "~> 0.10.0"}
+	{:membrane_udp_plugin, "~> 0.12.0"}
     {:membrane_hackney_plugin, "~> 0.6"},
     {:membrane_file_plugin, "~> 0.9"}
   ]
