@@ -32,7 +32,7 @@ defmodule Membrane.UDP.SinkIntegrationTest do
   test "Sends udp packet through Endpoint", %{state: state} do
     payload = "A lot of laughs"
 
-    Endpoint.handle_write(:input, %Buffer{payload: payload}, nil, state)
+    Endpoint.handle_buffer(:input, %Buffer{payload: payload}, nil, state)
 
     assert_receive {:udp, _, @local_address, @local_port_no, ^payload}
   end

@@ -42,7 +42,7 @@ defmodule Membrane.UDP.SinkUnitTest do
         dst_socket: dst_socket
       }
 
-      assert Endpoint.handle_write(:input, %Buffer{payload: payload_data}, nil, state) ==
+      assert Endpoint.handle_buffer(:input, %Buffer{payload: payload_data}, nil, state) ==
                {[demand: :input], state}
 
       assert_called(Socket, :send, [^dst_socket, ^local_socket, ^payload_data])

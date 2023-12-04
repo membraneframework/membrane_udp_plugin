@@ -61,7 +61,7 @@ defmodule Membrane.UDP.IntegrationTest do
 
     pipeline =
       Pipeline.start_link_supervised!(
-        structure: [
+        spec: [
           child(:endpoint, %UDP.Endpoint{
             local_port_no: @target_port,
             local_address: @localhostv4,
@@ -76,8 +76,6 @@ defmodule Membrane.UDP.IntegrationTest do
 
     assert_pipeline_notified(pipeline, :endpoint, {:connection_info, @localhostv4, @target_port})
 
-    assert_pipeline_play(pipeline)
-
     assert_end_of_stream(pipeline, :endpoint)
 
     1..@payload_frames
@@ -86,8 +84,7 @@ defmodule Membrane.UDP.IntegrationTest do
       assert_sink_buffer(pipeline, :sink, %Buffer{payload: ^payload})
     end)
 
-    Pipeline.terminate(pipeline, blocking?: true)
-    Pipeline.terminate(pipeline, blocking?: true)
+    Pipeline.terminate(pipeline)
   end
 
   test "NAT pierce datagram comes through" do

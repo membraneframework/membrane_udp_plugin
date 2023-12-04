@@ -43,9 +43,10 @@ defmodule Membrane.UDP.Endpoint do
 
   def_input_pad :input,
     accepted_format: _any,
+    flow_control: :manual,
     demand_unit: :buffers
 
-  def_output_pad :output, accepted_format: %RemoteStream{type: :packetized}, mode: :push
+  def_output_pad :output, accepted_format: %RemoteStream{type: :packetized}, flow_control: :push
 
   # Private API
 
@@ -79,7 +80,7 @@ defmodule Membrane.UDP.Endpoint do
   end
 
   @impl true
-  def handle_write(:input, %Buffer{payload: payload}, _context, state) do
+  def handle_buffer(:input, %Buffer{payload: payload}, _context, state) do
     %{dst_socket: dst_socket, local_socket: local_socket} = state
 
     case mockable(Socket).send(dst_socket, local_socket, payload) do
