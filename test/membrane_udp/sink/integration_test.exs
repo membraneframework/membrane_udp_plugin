@@ -19,21 +19,14 @@ defmodule Membrane.UDP.SinkIntegrationTest do
 
   setup [:setup_state, :setup_socket_from_state]
 
-  @tag open_socket_from_state: [:dst_socket, :local_socket]
-  test "Sends udp packet through Sink", %{state: state} do
-    payload = "A lot of laughs"
+  for module <- [Endpoint, Sink] do
+    @tag open_socket_from_state: [:dst_socket, :local_socket]
+    test "Sends udp packet through #{inspect(module)}", %{state: state} do
+      payload = "A lot of laughs"
 
-    Sink.handle_buffer(:input, %Buffer{payload: payload}, nil, state)
+      unquote(module).handle_buffer(:input, %Buffer{payload: payload}, nil, state)
 
-    assert_receive {:udp, _, @local_address, @local_port_no, ^payload}
-  end
-
-  @tag open_socket_from_state: [:dst_socket, :local_socket]
-  test "Sends udp packet through Endpoint", %{state: state} do
-    payload = "A lot of laughs"
-
-    Endpoint.handle_buffer(:input, %Buffer{payload: payload}, nil, state)
-
-    assert_receive {:udp, _, @local_address, @local_port_no, ^payload}
+      assert_receive {:udp, _, @local_address, @local_port_no, ^payload}
+    end
   end
 end
