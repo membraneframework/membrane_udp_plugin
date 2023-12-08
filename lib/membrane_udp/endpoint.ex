@@ -1,6 +1,7 @@
 defmodule Membrane.UDP.Endpoint do
   @moduledoc """
-  Element that sends buffers received on the input pad over a UDP socket.
+  Element that sends buffers received on the input pad over a UDP socket and
+  reads packets from a UDP socket and sends their payloads through the output pad.
   """
   use Membrane.Endpoint
 
@@ -21,16 +22,17 @@ defmodule Membrane.UDP.Endpoint do
                 spec: :inet.socket_address(),
                 default: :any,
                 description: """
-                An IP Address set for a UDP socket used to sent packets. It allows to specify which
-                network interface to use if there's more than one.
+                This address is used in two cases:
+                * An IP Address set for a UDP socket used to sent packets.
+                * An IP Address on which the socket will listen.
+                In both cases, it allows to choose which network interface to use if there's more than one.
                 """
               ],
               local_port_no: [
                 spec: :inet.port_number(),
                 default: 0,
                 description: """
-                A UDP port number for the socket used to sent packets. If set to `0` (default)
-                the underlying OS will assign a free UDP port.
+                A UDP port number used when opening a receiving socket and for sending packets.
                 """
               ],
               recv_buffer_size: [
