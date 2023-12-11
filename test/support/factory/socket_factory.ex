@@ -9,7 +9,8 @@ defmodule Membrane.UDP.SocketFactory do
   def local_socket(port),
     do: %Socket{
       port_no: port,
-      ip_address: @local
+      ip_address: @local,
+      sock_opts: [recbuf: 1024 * 1024]
     }
 
   @spec local_address() :: :inet.socket_address()
