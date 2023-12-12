@@ -3,30 +3,28 @@ defmodule Membrane.UDP.SinkUnitTest do
   use Mockery
 
   alias Membrane.Buffer
-  alias Membrane.UDP.{Sink, Socket, SocketFactory}
+  alias Membrane.UDP.{Endpoint, Sink, Socket}
 
-  describe "Sink element" do
-    test "handle_buffer/4 calls send and demands more data" do
-      mock(Socket, [send: 3], :ok)
-      payload_data = "binary data"
-      local_socket = SocketFactory.local_socket(1234)
-      dst_socket = SocketFactory.local_socket(4321)
+  @local_address {127, 0, 0, 1}
 
-      state = %{
-        local_socket: local_socket,
-        dst_socket: dst_socket
-      }
+  for module <- [Endpoint, Sink] do
+    describe "#{inspect(module)} element" do
+      test "handle_buffer/4 calls send and demands more data" do
+        mock(Socket, [send: 3], :ok)
+        payload_data = "binary data"
+        local_socket = %Socket{port_no: 1234, ip_address: @local_address}
+        dst_socket = %Socket{port_no: 4321, ip_address: @local_address}
 
-      assert Sink.handle_buffer(:input, %Buffer{payload: payload_data}, nil, state) ==
-               {[demand: :input], state}
+        state = %{
+          local_socket: local_socket,
+          dst_socket: dst_socket
+        }
 
-      assert_called(Socket, :send, [^dst_socket, ^local_socket, ^payload_data])
-    end
+        assert unquote(module).handle_buffer(:input, %Buffer{payload: payload_data}, nil, state) ==
+                 {[], state}
 
-    test "demands data when starting to play" do
-      assert {commands, nil} = Sink.handle_playing(nil, nil)
-
-      assert Keyword.fetch(commands, :demand) == {:ok, :input}
+        assert_called(Socket, :send, [^dst_socket, ^local_socket, ^payload_data])
+      end
     end
   end
 end
