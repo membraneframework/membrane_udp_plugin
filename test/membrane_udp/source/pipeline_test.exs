@@ -4,7 +4,7 @@ defmodule Membrane.UDP.SourcePipelineTest do
   import Membrane.Testing.Assertions
   import Membrane.ChildrenSpec
 
-  alias Membrane.UDP.{Socket, Source}
+  alias Membrane.UDP.Source
   alias Membrane.Testing.{Pipeline, Sink}
 
   @local_address {127, 0, 0, 1}

@@ -8,7 +8,7 @@ defmodule Membrane.UDP.SinkIntegrationTest do
 
   @destination_port_no 5001
   @local_port_no 5000
-  @local_address {127,0,0,1}
+  @local_address {127, 0, 0, 1}
 
   defp setup_state(_ctx) do
     dst_socket = %Socket{port_no: @destination_port_no, ip_address: @local_address}

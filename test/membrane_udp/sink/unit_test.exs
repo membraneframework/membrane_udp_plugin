@@ -3,9 +3,9 @@ defmodule Membrane.UDP.SinkUnitTest do
   use Mockery
 
   alias Membrane.Buffer
-  alias Membrane.UDP.{Endpoint, Sink, Socket, SocketFactory}
+  alias Membrane.UDP.{Endpoint, Sink, Socket}
 
-  @local_address {127,0,0,1}
+  @local_address {127, 0, 0, 1}
 
   for module <- [Endpoint, Sink] do
     describe "#{inspect(module)} element" do

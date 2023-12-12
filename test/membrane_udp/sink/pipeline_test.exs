@@ -7,7 +7,7 @@ defmodule Membrane.UDP.SinkPipelineTest do
   alias Membrane.UDP.{Sink, Socket}
   alias Membrane.Testing.{Pipeline, Source}
 
-  @local_address {127,0,0,1}
+  @local_address {127, 0, 0, 1}
   @local_port_no 5051
   @destination_port_no 5015
   @values 1..100
