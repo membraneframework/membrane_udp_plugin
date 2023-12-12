@@ -4,12 +4,12 @@ defmodule Membrane.UDP.CommonBehaviourTest do
 
   import Membrane.Testing.Assertions
 
-  alias Membrane.UDP.{CommonSocketBehaviour, Socket, SocketFactory}
+  alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
   describe "CommonBehaviour" do
     test "opens and close socket when transitioning through states" do
       # socket up
-      socket = SocketFactory.local_socket(123)
+      socket = %Socket{port_no: 123, ip_address: {127,0,0,1}}
       guard = Membrane.Testing.MockResourceGuard.start_link_supervised!()
 
       mock(Socket, [open: 1], fn socket ->

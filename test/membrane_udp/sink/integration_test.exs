@@ -4,15 +4,15 @@ defmodule Membrane.UDP.SinkIntegrationTest do
   import SocketSetup
 
   alias Membrane.Buffer
-  alias Membrane.UDP.{Endpoint, Sink, SocketFactory}
+  alias Membrane.UDP.{Endpoint, Sink, Socket}
 
   @destination_port_no 5001
   @local_port_no 5000
-  @local_address SocketFactory.local_address()
+  @local_address {127,0,0,1}
 
   defp setup_state(_ctx) do
-    dst_socket = SocketFactory.local_socket(@destination_port_no)
-    local_socket = SocketFactory.local_socket(@local_port_no)
+    dst_socket = %Socket{port_no: @destination_port_no, ip_address: @local_address}
+    local_socket = %Socket{port_no: @local_port_no, ip_address: @local_address}
 
     %{state: %{dst_socket: dst_socket, local_socket: local_socket}}
   end

@@ -4,7 +4,7 @@ defmodule Membrane.UDP.SourcePipelineTest do
   import Membrane.Testing.Assertions
   import Membrane.ChildrenSpec
 
-  alias Membrane.UDP.{SocketFactory, Source}
+  alias Membrane.UDP.{Socket, Source}
   alias Membrane.Testing.{Pipeline, Sink}
 
   @local_address {127, 0, 0, 1}
@@ -20,7 +20,7 @@ defmodule Membrane.UDP.SourcePipelineTest do
              Pipeline.start_link_supervised!(
                spec: [
                  child(:udp_source, %Source{
-                   local_address: SocketFactory.local_address(),
+                   local_address: @local_address,
                    local_port_no: @destination_port_no
                  })
                  |> child(:sink, %Sink{})

@@ -43,10 +43,7 @@ defmodule Membrane.UDP.Endpoint do
                 """
               ]
 
-  def_input_pad :input,
-    accepted_format: _any,
-    flow_control: :manual,
-    demand_unit: :buffers
+  def_input_pad :input, accepted_format: _any
 
   def_output_pad :output, accepted_format: %RemoteStream{type: :packetized}, flow_control: :push
 
@@ -78,7 +75,7 @@ defmodule Membrane.UDP.Endpoint do
 
   @impl true
   def handle_playing(_context, state) do
-    {[demand: :input, stream_format: {:output, %RemoteStream{type: :packetized}}], state}
+    {[stream_format: {:output, %RemoteStream{type: :packetized}}], state}
   end
 
   @impl true
@@ -86,7 +83,7 @@ defmodule Membrane.UDP.Endpoint do
     %{dst_socket: dst_socket, local_socket: local_socket} = state
 
     case mockable(Socket).send(dst_socket, local_socket, payload) do
-      :ok -> {[demand: :input], state}
+      :ok -> {[], state}
       {:error, cause} -> raise "Error sending UDP packet, reason: #{inspect(cause)}"
     end
   end

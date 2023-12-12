@@ -34,10 +34,7 @@ defmodule Membrane.UDP.Sink do
                 """
               ]
 
-  def_input_pad :input,
-    accepted_format: _any,
-    flow_control: :manual,
-    demand_unit: :buffers
+  def_input_pad :input, accepted_format: _any
 
   # Private API
 
@@ -66,7 +63,7 @@ defmodule Membrane.UDP.Sink do
 
   @impl true
   def handle_playing(_context, state) do
-    {[demand: :input], state}
+    {[], state}
   end
 
   @impl true
@@ -74,7 +71,7 @@ defmodule Membrane.UDP.Sink do
     %{dst_socket: dst_socket, local_socket: local_socket} = state
 
     case mockable(Socket).send(dst_socket, local_socket, payload) do
-      :ok -> {[demand: :input], state}
+      :ok -> {[], state}
       {:error, cause} -> raise "Error sending UDP packet, reason: #{inspect(cause)}"
     end
   end

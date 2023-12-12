@@ -4,16 +4,16 @@ defmodule Membrane.UDP.SinkPipelineTest do
   import SocketSetup
   import Membrane.ChildrenSpec
 
-  alias Membrane.UDP.{Sink, SocketFactory}
+  alias Membrane.UDP.{Sink, Socket}
   alias Membrane.Testing.{Pipeline, Source}
 
-  @local_address SocketFactory.local_address()
+  @local_address {127,0,0,1}
   @local_port_no 5051
   @destination_port_no 5015
   @values 1..100
 
   defp setup_state(_ctx) do
-    open_local_socket = SocketFactory.local_socket(@destination_port_no)
+    open_local_socket = %Socket{port_no: @destination_port_no, ip_address: @local_address}
 
     %{state: %{local_socket: open_local_socket}}
   end
@@ -29,9 +29,9 @@ defmodule Membrane.UDP.SinkPipelineTest do
                spec: [
                  child(:test_source, %Source{output: data})
                  |> child(:udp_sink, %Sink{
-                   destination_address: SocketFactory.local_address(),
+                   destination_address: @local_address,
                    destination_port_no: @destination_port_no,
-                   local_address: SocketFactory.local_address(),
+                   local_address: @local_address,
                    local_port_no: @local_port_no
                  })
                ]
