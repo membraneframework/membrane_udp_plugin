@@ -13,7 +13,11 @@ defmodule Membrane.UDP.SinkPipelineTest do
   @values 1..100
 
   defp setup_state(_ctx) do
-    open_local_socket = %Socket{port_no: @destination_port_no, ip_address: @local_address}
+    open_local_socket = %Socket{
+      port_no: @destination_port_no,
+      ip_address: @local_address,
+      sock_opts: [recbuf: 1024 * 1024]
+    }
 
     %{state: %{local_socket: open_local_socket}}
   end
