@@ -72,7 +72,7 @@ defmodule Membrane.UDP.Source do
   def handle_playing(_ctx, %{pierce_nat_ctx: nat_ctx} = state) do
     ip =
       if is_nil(Map.get(nat_ctx, :address)),
-        do: parse_address(nat_ctx.uri),
+        do: Socket.parse_address(nat_ctx.uri),
         else: nat_ctx.address
 
     nat_ctx = Map.put(nat_ctx, :address, ip)
@@ -120,18 +120,4 @@ defmodule Membrane.UDP.Source do
 
   @impl true
   defdelegate handle_setup(context, state), to: CommonSocketBehaviour
-
-  defp parse_address(uri) do
-    hostname =
-      URI.parse(uri)
-      |> Map.get(:host)
-      |> to_charlist()
-
-    Enum.find_value([:inet, :inet6, :local], fn addr_family ->
-      case :inet.getaddr(hostname, addr_family) do
-        {:ok, address} -> address
-        {:error, _reason} -> false
-      end
-    end)
-  end
 end

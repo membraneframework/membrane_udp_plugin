@@ -41,6 +41,28 @@ defmodule Membrane.UDP.Endpoint do
                 description: """
                 Size of the receive buffer. Packages of size greater than this buffer will be truncated
                 """
+              ],
+              pierce_nat_ctx: [
+                spec:
+                  %{
+                    uri: URI.t(),
+                    address: :inet.ip_address(),
+                    port: pos_integer()
+                  }
+                  | nil,
+                default: nil,
+                description: """
+                Context necessary to make an attempt to create client-side NAT binding
+                by sending an empty datagram from the `#{inspect(__MODULE__)}` to an arbitrary host.
+
+                * If left as `nil`, no attempt will ever be made.
+                * If filled in, whenever the pipeline switches playback to `:playing`,
+                one datagram (with an empty payload) will be sent from the opened socket
+                to the `:port` at `:address` provided via this option.
+                If `:address` is not present, it will be parsed from `:uri`.
+
+                Disclaimer: This is a potential vulnerability. Use with caution.
+                """
               ]
 
   def_input_pad :input, accepted_format: _any
@@ -55,7 +77,8 @@ defmodule Membrane.UDP.Endpoint do
       destination_address: dst_address,
       destination_port_no: dst_port_no,
       local_address: local_address,
-      local_port_no: local_port_no
+      local_port_no: local_port_no,
+      pierce_nat_ctx: pierce_nat_ctx
     } = opts
 
     state = %{
@@ -67,15 +90,31 @@ defmodule Membrane.UDP.Endpoint do
         ip_address: local_address,
         port_no: local_port_no,
         sock_opts: [recbuf: opts.recv_buffer_size]
-      }
+      },
+      pierce_nat_ctx: pierce_nat_ctx
     }
 
     {[], state}
   end
 
   @impl true
-  def handle_playing(_context, state) do
+  def handle_playing(_context, %{pierce_nat_ctx: nil} = state) do
     {[stream_format: {:output, %RemoteStream{type: :packetized}}], state}
+  end
+
+  @impl true
+  def handle_playing(_context, %{pierce_nat_ctx: nat_ctx} = state) do
+    ip =
+      if is_nil(Map.get(nat_ctx, :address)),
+        do: Socket.parse_address(nat_ctx.uri),
+        else: nat_ctx.address
+
+    nat_ctx = Map.put(nat_ctx, :address, ip)
+
+    Socket.send(%Socket{ip_address: ip, port_no: nat_ctx.port}, state.local_socket, <<>>)
+
+    {[stream_format: {:output, %RemoteStream{type: :packetized}}],
+     %{state | pierce_nat_ctx: nat_ctx}}
   end
 
   @impl true

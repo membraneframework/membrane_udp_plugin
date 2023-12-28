@@ -111,4 +111,35 @@ defmodule Membrane.UDP.IntegrationTest do
     handle = server_sock.socket_handle
     assert_receive({:udp, ^handle, @localhostv4, @target_port, <<>>}, 20_000)
   end
+
+  test "NAT pierce datagram comes through with endpoint" do
+    {:ok, server_sock} =
+      UDP.Socket.open(%UDP.Socket{port_no: @server_port, ip_address: @localhostv4})
+
+    payload = 1..@payload_frames |> Enum.map(&inspect/1)
+
+    pipeline =
+      Pipeline.start_link_supervised!(
+        spec: [
+          child(:endpoint, %UDP.Endpoint{
+            local_port_no: @target_port,
+            local_address: @localhostv4,
+            destination_port_no: @target_port,
+            destination_address: @localhostv4,
+            pierce_nat_ctx: %{
+              address: @localhostv4,
+              port: @server_port
+            }
+          })
+          |> child(:sink, %Testing.Sink{}),
+          child(:source, %Testing.Source{output: payload})
+          |> get_child(:endpoint)
+        ]
+      )
+
+    assert_pipeline_notified(pipeline, :endpoint, {:connection_info, @localhostv4, @target_port})
+
+    handle = server_sock.socket_handle
+    assert_receive({:udp, ^handle, @localhostv4, @target_port, <<>>}, 20_000)
+  end
 end

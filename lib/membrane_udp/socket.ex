@@ -45,4 +45,19 @@ defmodule Membrane.UDP.Socket do
       when is_port(socket_handle) do
     :gen_udp.send(socket_handle, target_ip, target_port_no, payload)
   end
+
+  @spec parse_address(URI.t()) :: :inet.ip_address() | nil
+  def parse_address(uri) do
+    hostname =
+      URI.parse(uri)
+      |> Map.get(:host)
+      |> to_charlist()
+
+    Enum.find_value([:inet, :inet6, :local], fn addr_family ->
+      case :inet.getaddr(hostname, addr_family) do
+        {:ok, address} -> address
+        {:error, _reason} -> false
+      end
+    end)
+  end
 end
