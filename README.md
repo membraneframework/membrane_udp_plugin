@@ -16,7 +16,7 @@ Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ## Usage example
 
-The `example/` older contains examples of sending and receiving UDP streams.
+The `example/` folder contains examples of sending and receiving UDP streams.
 
 The `UDPDemo.Receive` retrieves packets from UDP socket and saves the data to the `/tmp/udp-recv.mp4` file.
 ```bash
