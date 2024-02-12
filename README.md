@@ -16,16 +16,17 @@ Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ## Usage example
 
-The `example/` shows 2 pipelines. 
-
-The `UDPDemo.Send` downloads an example file over HTTP and sends it over UDP socket via localhost:
-```bash
-$ elixir examples/sink.exs
-```
+The `example/` older contains examples of sending and receiving UDP streams.
 
 The `UDPDemo.Receive` retrieves packets from UDP socket and saves the data to the `/tmp/udp-recv.mp4` file.
 ```bash
-$ elixir examples/source.exs
+$ elixir examples/receive.exs
+```
+
+The `UDPDemo.Send` downloads an example file over HTTP and sends it over UDP socket via localhost:5001.
+It should be started after the receiver server is already running.
+```bash
+$ elixir examples/send.exs
 ```
 
 Bear in mind that for other files/sending pipelines you may need do adjust
