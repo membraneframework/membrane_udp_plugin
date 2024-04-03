@@ -6,7 +6,6 @@ defmodule Membrane.UDP.MixProject do
 
   def project do
     [
-      homepage_url: "https://membrane.stream",
       app: :membrane_udp_plugin,
       version: @version,
       elixir: "~> 1.12",
@@ -17,7 +16,8 @@ defmodule Membrane.UDP.MixProject do
       source_url: @github_url,
       docs: docs(),
       deps: deps(),
-      dialyzer: dialyzer()
+      dialyzer: dialyzer(),
+      homepage_url: "https://membrane.stream"
     ]
   end
 
