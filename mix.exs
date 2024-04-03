@@ -16,7 +16,8 @@ defmodule Membrane.UDP.MixProject do
       source_url: @github_url,
       docs: docs(),
       deps: deps(),
-      dialyzer: dialyzer()
+      dialyzer: dialyzer(),
+      homepage_url: "https://membrane.stream"
     ]
   end
 
