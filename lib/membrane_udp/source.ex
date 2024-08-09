@@ -1,6 +1,9 @@
 defmodule Membrane.UDP.Source do
   @moduledoc """
   Element that reads packets from a UDP socket and sends their payloads through the output pad.
+
+  By receiving a `:close_socket` notification this element will close the socket and send
+  `end_of_stream` to it's output pad.
   """
   use Membrane.Source
 
@@ -81,6 +84,12 @@ defmodule Membrane.UDP.Source do
 
     {[stream_format: {:output, %RemoteStream{type: :packetized}}],
      %{state | pierce_nat_ctx: nat_ctx}}
+  end
+
+  @impl true
+  def handle_parent_notification(:close_socket, _ctx, state) do
+    Socket.close(state.local_socket)
+    {[end_of_stream: :output], state}
   end
 
   @impl true
