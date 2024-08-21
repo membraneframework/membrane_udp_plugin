@@ -4,14 +4,15 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
   import Mockery.Macro
 
   alias Membrane.Element
-  alias Membrane.Element.Base
   alias Membrane.Element.CallbackContext
   alias Membrane.UDP.Socket
 
   @spec handle_setup(
           context :: CallbackContext.t(),
           state :: Element.state()
-        ) :: Base.callback_return()
+        ) ::
+          {[Membrane.Element.Action.common_actions() | Membrane.Element.Action.setup()],
+           Membrane.Element.state()}
   def handle_setup(ctx, %{local_socket: %Socket{} = local_socket} = state) do
     case mockable(Socket).open(local_socket) do
       {:ok, socket} ->

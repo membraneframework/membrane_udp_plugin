@@ -33,7 +33,7 @@ defmodule Membrane.UDP.SourcePipelineTest do
 
     Enum.map(data, fn elem ->
       udp_like_message = {:udp, nil, @local_address, @local_port_no, elem}
-      Pipeline.message_child(pipeline, :udp_source, udp_like_message)
+      Pipeline.notify_child(pipeline, :udp_source, udp_like_message)
     end)
 
     Enum.each(data, fn elem ->
@@ -52,6 +52,10 @@ defmodule Membrane.UDP.SourcePipelineTest do
         @timeout
       )
     end)
+
+    Pipeline.notify_child(pipeline, :udp_source, :close_socket)
+
+    assert_end_of_stream(pipeline, :sink)
 
     Pipeline.terminate(pipeline)
   end
