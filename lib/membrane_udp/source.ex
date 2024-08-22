@@ -51,6 +51,14 @@ defmodule Membrane.UDP.Source do
 
                 Disclaimer: This is a potential vulnerability. Use with caution.
                 """
+              ],
+              local_socket: [
+                spec: :gen_tcp.socket() | nil,
+                default: nil,
+                description: """
+                Already connected UDP socket, if provided it will be used instead of creating
+                and connecting a new one.
+                """
               ]
 
   def_output_pad :output, accepted_format: %RemoteStream{type: :packetized}, flow_control: :push
