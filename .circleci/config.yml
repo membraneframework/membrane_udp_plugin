@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  elixir: membraneframework/elixir@dev:5673114ed0e3a4166faf642d9dbd55e0f9dd55d9
+  elixir: membraneframework/elixir@dev:eae7d91ff91b5530b93017c241d381dedb0684b3
 
 workflows:
   version: 2
