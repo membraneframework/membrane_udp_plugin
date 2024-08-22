@@ -32,6 +32,14 @@ defmodule Membrane.UDP.Sink do
                 A UDP port number for the socket used to sent packets. If set to `0` (default)
                 the underlying OS will assign a free UDP port.
                 """
+              ],
+              local_socket: [
+                spec: :gen_tcp.socket() | nil,
+                default: nil,
+                description: """
+                Already connected UDP socket, if provided it will be used instead of creating
+                and connecting a new one.
+                """
               ]
 
   def_input_pad :input, accepted_format: _any
@@ -44,7 +52,8 @@ defmodule Membrane.UDP.Sink do
       destination_address: dst_address,
       destination_port_no: dst_port_no,
       local_address: local_address,
-      local_port_no: local_port_no
+      local_port_no: local_port_no,
+      local_socket: local_socket
     } = options
 
     state = %{
@@ -54,7 +63,8 @@ defmodule Membrane.UDP.Sink do
       },
       local_socket: %Socket{
         ip_address: local_address,
-        port_no: local_port_no
+        port_no: local_port_no,
+        socket_handle: local_socket
       }
     }
 

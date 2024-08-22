@@ -13,39 +13,73 @@ defmodule Membrane.UDP.SinkPipelineTest do
   @values 1..100
 
   defp setup_state(_ctx) do
-    open_local_socket = %Socket{
+    dst_socket = %Socket{
       port_no: @destination_port_no,
       ip_address: @local_address,
       sock_opts: [recbuf: 1024 * 1024]
     }
 
-    %{state: %{local_socket: open_local_socket}}
+    local_socket = %Socket{
+      port_no: @local_port_no,
+      ip_address: @local_address,
+      sock_opts: [recbuf: 1024 * 1024]
+    }
+
+    %{state: %{dst_socket: dst_socket, local_socket: local_socket}}
   end
 
   setup [:setup_state, :setup_socket_from_state]
 
-  @tag open_socket_from_state: [:local_socket]
-  test "100 messages passes through pipeline" do
-    data = @values |> Enum.map(&to_string(&1))
+  describe "100 messages pass through a pipeline when the sink" do
+    @tag open_socket_from_state: [:dst_socket]
+    test "open its own socket" do
+      data = @values |> Enum.map(&to_string(&1))
 
-    assert pipeline =
-             Pipeline.start_link_supervised!(
-               spec: [
-                 child(:test_source, %Source{output: data})
-                 |> child(:udp_sink, %Sink{
-                   destination_address: @local_address,
-                   destination_port_no: @destination_port_no,
-                   local_address: @local_address,
-                   local_port_no: @local_port_no
-                 })
-               ]
-             )
+      assert pipeline =
+               Pipeline.start_link_supervised!(
+                 spec: [
+                   child(:test_source, %Source{output: data})
+                   |> child(:udp_sink, %Sink{
+                     destination_address: @local_address,
+                     destination_port_no: @destination_port_no,
+                     local_address: @local_address,
+                     local_port_no: @local_port_no
+                   })
+                 ]
+               )
 
-    Enum.each(@values, fn elem ->
-      expected_value = to_string(elem)
-      assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}, 1000
-    end)
+      Enum.each(@values, fn elem ->
+        expected_value = to_string(elem)
+        assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}, 1000
+      end)
 
-    Pipeline.terminate(pipeline)
+      Pipeline.terminate(pipeline)
+    end
+
+    @tag open_socket_from_state: [:local_socket, :dst_socket]
+    test "gets an open socket via options", %{state: %{local_socket: local_socket}} do
+      data = @values |> Enum.map(&to_string(&1))
+
+      assert pipeline =
+               Pipeline.start_link_supervised!(
+                 spec: [
+                   child(:test_source, %Source{output: data})
+                   |> child(:udp_sink, %Sink{
+                     destination_address: @local_address,
+                     destination_port_no: @destination_port_no,
+                     local_address: @local_address,
+                     local_port_no: @local_port_no,
+                     local_socket: local_socket.socket_handle
+                   })
+                 ]
+               )
+
+      Enum.each(@values, fn elem ->
+        expected_value = to_string(elem)
+        assert_receive {:udp, _, @local_address, @local_port_no, ^expected_value}, 1000
+      end)
+
+      Pipeline.terminate(pipeline)
+    end
   end
 end
