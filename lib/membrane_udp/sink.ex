@@ -37,8 +37,8 @@ defmodule Membrane.UDP.Sink do
                 spec: :gen_tcp.socket() | nil,
                 default: nil,
                 description: """
-                Already connected UDP socket, if provided it will be used instead of creating
-                and connecting a new one.
+                Already opened UDP socket, if provided it will be used instead of creating
+                and opening a new one.
                 """
               ]
 
