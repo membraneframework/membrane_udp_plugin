@@ -32,7 +32,7 @@ defmodule Membrane.UDP.SinkPipelineTest do
 
   describe "100 messages pass through a pipeline when the sink" do
     @tag open_socket_from_state: [:dst_socket]
-    test "open its own socket" do
+    test "opens its own socket" do
       data = @values |> Enum.map(&to_string(&1))
 
       assert pipeline =

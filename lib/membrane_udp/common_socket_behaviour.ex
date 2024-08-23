@@ -13,8 +13,8 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
         ) ::
           {[Membrane.Element.Action.common_actions() | Membrane.Element.Action.setup()],
            Membrane.Element.state()}
-  def handle_setup(ctx, %{local_socket: %Socket{socket_handle: nil} = local_socket} = state) do
-    case mockable(Socket).open(local_socket) do
+  def handle_setup(ctx, %{local_socket: %Socket{socket_handle: nil}} = state) do
+    case mockable(Socket).open(state.local_socket) do
       {:ok, socket} ->
         notification = {:connection_info, socket.ip_address, socket.port_no}
 
@@ -31,21 +31,21 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
     end
   end
 
-  def handle_setup(_ctx, %{local_socket: %Socket{socket_handle: handle} = local_socket} = state) do
-    {:ok, {socket_address, socket_port}} = :inet.sockname(handle)
+  def handle_setup(_ctx, state) do
+    {:ok, {socket_address, socket_port}} = :inet.sockname(state.local_socket.socket_handle)
 
     cond do
-      local_socket.ip_address not in [socket_address, :any] ->
+      state.local_socket.ip_address not in [socket_address, :any] ->
         raise "Local address passed in options not matching the one of the passed socket."
 
-      local_socket.port_no not in [socket_port, 0] ->
+      state.local_socket.port_no not in [socket_port, 0] ->
         raise "Local port passed in options not matching the one of the passed socket."
 
       true ->
         :ok
     end
 
-    {[], %{state | local_socket: local_socket}}
+    {[], state}
   end
 
   defp close_socket(%Socket{} = local_socket) do

@@ -34,7 +34,7 @@ defmodule Membrane.UDP.Sink do
                 """
               ],
               local_socket: [
-                spec: :gen_tcp.socket() | nil,
+                spec: :gen_udp.socket() | nil,
                 default: nil,
                 description: """
                 Already opened UDP socket, if provided it will be used instead of creating
