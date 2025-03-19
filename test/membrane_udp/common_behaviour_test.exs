@@ -1,6 +1,6 @@
 defmodule Membrane.UDP.CommonBehaviourTest do
   use ExUnit.Case
-  use Mockery
+  use Mimic.DSL
 
   import Membrane.Testing.Assertions
 
@@ -12,9 +12,7 @@ defmodule Membrane.UDP.CommonBehaviourTest do
       socket = %Socket{port_no: 123, ip_address: {127, 0, 0, 1}}
       guard = Membrane.Testing.MockResourceGuard.start_link_supervised!()
 
-      mock(Socket, [open: 1], fn socket ->
-        {:ok, %Socket{socket | socket_handle: self()}}
-      end)
+      expect(Socket.open(socket), do: {:ok, %Socket{socket | socket_handle: self()}})
 
       ctx = %{resource_guard: guard}
       state = %{local_socket: socket}
@@ -25,13 +23,14 @@ defmodule Membrane.UDP.CommonBehaviourTest do
       assert_resource_guard_register(guard, close_socket, :udp_guard)
 
       assert result_socket.socket_handle == self()
-      assert_called(Socket, :open)
 
-      # socket down
-      mock(Socket, [close: 1], %Socket{socket | socket_handle: nil})
-      close_socket.()
       self_pid = self()
-      assert_called(Socket, :close, [%{socket_handle: ^self_pid}])
+
+      expect(Socket.close(%{socket_handle: ^self_pid} = socket),
+        do: %Socket{socket | socket_handle: nil}
+      )
+
+      close_socket.()
     end
   end
 end

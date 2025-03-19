@@ -3,9 +3,7 @@ defmodule Membrane.UDP.Endpoint do
   Element that sends buffers received on the input pad over a UDP socket and
   reads packets from a UDP socket and sends their payloads through the output pad.
   """
-  use Membrane.Endpoint
-
-  import Mockery.Macro
+  use Membrane.Endpoint, flow_control_hints?: false
 
   alias Membrane.{Buffer, RemoteStream}
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
@@ -82,7 +80,7 @@ defmodule Membrane.UDP.Endpoint do
   def handle_buffer(:input, %Buffer{payload: payload}, _context, state) do
     %{dst_socket: dst_socket, local_socket: local_socket} = state
 
-    case mockable(Socket).send(dst_socket, local_socket, payload) do
+    case Socket.send(dst_socket, local_socket, payload) do
       :ok -> {[], state}
       {:error, cause} -> raise "Error sending UDP packet, reason: #{inspect(cause)}"
     end

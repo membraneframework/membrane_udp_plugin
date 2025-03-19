@@ -1,8 +1,6 @@
 defmodule Membrane.UDP.CommonSocketBehaviour do
   @moduledoc false
 
-  import Mockery.Macro
-
   alias Membrane.Element
   alias Membrane.Element.CallbackContext
   alias Membrane.UDP.Socket
@@ -14,7 +12,7 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
           {[Membrane.Element.Action.common_actions() | Membrane.Element.Action.setup()],
            Membrane.Element.state()}
   def handle_setup(ctx, %{local_socket: %Socket{socket_handle: nil}} = state) do
-    case mockable(Socket).open(state.local_socket) do
+    case Socket.open(state.local_socket) do
       {:ok, socket} ->
         notification = {:connection_info, socket.ip_address, socket.port_no}
 
@@ -49,6 +47,6 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
   end
 
   defp close_socket(%Socket{} = local_socket) do
-    mockable(Socket).close(local_socket)
+    Socket.close(local_socket)
   end
 end
