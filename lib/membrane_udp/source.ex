@@ -102,11 +102,8 @@ defmodule Membrane.UDP.Source do
   end
 
   @impl true
-  def handle_info(
-        {:udp, _socket_handle, address, port_no, payload},
-        %{playback: :playing},
-        state
-      ) do
+  def handle_info({:udp, _socket_handle, address, port_no, payload}, ctx, state)
+      when ctx.playback == :playing and not ctx.pads.output.end_of_stream? do
     metadata =
       Map.new()
       |> Map.put(:udp_source_address, address)

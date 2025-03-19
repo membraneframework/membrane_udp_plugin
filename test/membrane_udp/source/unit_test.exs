@@ -12,7 +12,11 @@ defmodule Membrane.UDP.SourceTest do
       message = {:udp, 5000, sender_address, sender_port, example_binary_payload}
 
       assert {actions, ^state} =
-               unquote(module).handle_parent_notification(message, %{playback: :playing}, state)
+               unquote(module).handle_parent_notification(
+                 message,
+                 %{playback: :playing, pads: %{output: %{end_of_stream?: false}}},
+                 state
+               )
 
       assert {:output, buffer} = Keyword.get(actions, :buffer)
 
