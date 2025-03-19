@@ -54,7 +54,7 @@ defmodule Membrane.UDP.MixProject do
   defp deps do
     [
       {:membrane_core, "~> 1.0"},
-      {:mockery, "~> 2.3.0", runtime: false},
+      {:mimic, "~> 1.7", only: :test},
       {:ex_doc, "~> 0.28", only: :dev, runtime: false},
       {:dialyxir, "~> 1.1", only: :dev, runtime: false},
       {:credo, "~> 1.5", only: :dev, runtime: false}
