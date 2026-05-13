@@ -4,8 +4,8 @@ defmodule Membrane.UDP.SinkPipelineTest do
   import SocketSetup
   import Membrane.ChildrenSpec
 
-  alias Membrane.UDP.{Sink, Socket}
   alias Membrane.Testing.{Pipeline, Source}
+  alias Membrane.UDP.{Sink, Socket}
 
   @local_address {127, 0, 0, 1}
   @local_port_no 5051

@@ -1,7 +1,7 @@
 defmodule Membrane.UDP.MixProject do
   use Mix.Project
 
-  @version "0.14.1"
+  @version "0.14.2"
   @github_url "https://github.com/membraneframework/membrane_udp_plugin"
 
   def project do
@@ -55,9 +55,9 @@ defmodule Membrane.UDP.MixProject do
     [
       {:membrane_core, "~> 1.0"},
       {:mimic, "~> 1.7", only: :test},
-      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.1", only: :dev, runtime: false},
-      {:credo, "~> 1.5", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
+      {:credo, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
