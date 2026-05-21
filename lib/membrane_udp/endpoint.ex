@@ -3,28 +3,27 @@ defmodule Membrane.UDP.Endpoint do
   Element that sends buffers received on the input pad over a UDP socket and
   reads packets from a UDP socket and sends their payloads through the output pad.
 
-  The destination can be changed at runtime by sending a parent notification:
+  The local and destination addresses are provided at init via the element's
+  options; the destination can additionally be changed at runtime by returning
+  a `:notify_child` action with a `t:set_destination_notification/0`:
 
-      {:notify_child, {:endpoint, {:set_destination, {1, 2, 3, 4}, 5000}}}
+      {[notify_child: {:endpoint, {:set_destination, peer_ip, peer_port}}], state}
   """
   use Membrane.Endpoint, flow_control_hints?: false
 
   alias Membrane.{Buffer, RemoteStream}
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
+  @type set_destination_notification ::
+          {:set_destination, :inet.ip_address(), :inet.port_number()}
+
   def_options destination_address: [
                 spec: :inet.ip_address(),
-                description: """
-                An IP Address that the packets will be sent to.
-                Can be updated at runtime via the `:set_destination` parent notification.
-                """
+                description: "An IP Address that the packets will be sent to."
               ],
               destination_port_no: [
                 spec: :inet.port_number(),
-                description: """
-                A UDP port number of a target.
-                Can be updated at runtime via the `:set_destination` parent notification.
-                """
+                description: "A UDP port number of a target."
               ],
               local_address: [
                 spec: :inet.socket_address(),
@@ -65,6 +64,8 @@ defmodule Membrane.UDP.Endpoint do
       local_address: local_address,
       local_port_no: local_port_no
     } = opts
+
+    CommonSocketBehaviour.validate_destination!(dst_address, dst_port_no)
 
     state = %{
       dst_socket: %Socket{
