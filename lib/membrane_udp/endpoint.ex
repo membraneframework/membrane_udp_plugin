@@ -10,6 +10,12 @@ defmodule Membrane.UDP.Endpoint do
   ```elixir
   {[notify_child: {:endpoint, {:set_destination, peer_ip, peer_port}}], state}
   ```
+
+  With `latch?: true`, the outbound destination automatically follows the
+  source of the most recent inbound packet. This is useful for talking to
+  peers whose source address may differ from the initially configured
+  destination (e.g. peers behind NAT) or change over time (e.g. mobile peers
+  roaming networks).
   """
   use Membrane.Endpoint, flow_control_hints?: false
 
@@ -50,6 +56,16 @@ defmodule Membrane.UDP.Endpoint do
                 description: """
                 Size of the receive buffer. Packages of size greater than this buffer will be truncated
                 """
+              ],
+              latch?: [
+                spec: boolean(),
+                default: false,
+                description: """
+                When true, the outbound destination follows the source of the most
+                recent inbound packet. Until the first inbound packet arrives,
+                outbound goes to the configured destination (the `destination_*`
+                options, possibly overridden via `:set_destination`).
+                """
               ]
 
   def_input_pad :input, accepted_format: _any
@@ -78,7 +94,8 @@ defmodule Membrane.UDP.Endpoint do
         ip_address: local_address,
         port_no: local_port_no,
         sock_opts: [recbuf: opts.recv_buffer_size]
-      }
+      },
+      latch?: opts.latch?
     }
 
     {[], state}
@@ -133,6 +150,15 @@ defmodule Membrane.UDP.Endpoint do
       |> Map.put(:arrival_ts, Membrane.Time.vm_time())
 
     actions = [buffer: {:output, %Buffer{payload: payload, metadata: metadata}}]
+
+    state =
+      if state.latch? do
+        state
+        |> put_in([:dst_socket, :ip_address], address)
+        |> put_in([:dst_socket, :port_no], port_no)
+      else
+        state
+      end
 
     {actions, state}
   end

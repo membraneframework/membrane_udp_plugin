@@ -8,7 +8,7 @@ defmodule Membrane.UDP.SourceTest do
       example_binary_payload = "Hi there, I am binary"
       sender_port = 6666
       sender_address = {192, 168, 0, 1}
-      state = :unchanged
+      state = %{latch?: false}
       message = {:udp, 5000, sender_address, sender_port, example_binary_payload}
 
       assert {actions, ^state} =

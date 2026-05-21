@@ -159,6 +159,101 @@ defmodule Membrane.UDP.IntegrationTest do
     end
   end
 
+  test "latch?: false keeps the configured destination after an inbound packet" do
+    endpoint_port = 6310
+    port_a = 6311
+    port_b = 6312
+
+    {:ok, probe_a} = :gen_udp.open(port_a, [:binary, ip: @localhostv4, active: true])
+    {:ok, probe_b} = :gen_udp.open(port_b, [:binary, ip: @localhostv4, active: true])
+
+    on_exit(fn ->
+      :gen_udp.close(probe_a)
+      :gen_udp.close(probe_b)
+    end)
+
+    pipeline =
+      Pipeline.start_link_supervised!(
+        spec:
+          child(:source, PushSource)
+          |> child(:udp, %UDP.Endpoint{
+            local_port_no: endpoint_port,
+            local_address: @localhostv4,
+            destination_port_no: port_a,
+            destination_address: @localhostv4,
+            latch?: false
+          })
+          |> child(:sink, %Testing.Sink{})
+      )
+
+    assert_pipeline_notified(pipeline, :udp, {:connection_info, _addr, _port})
+
+    Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "to_a"}})
+    assert_receive {:udp, ^probe_a, @localhostv4, _from, "to_a"}, 2000
+
+    :gen_udp.send(probe_b, @localhostv4, endpoint_port, "from_b")
+    assert_sink_buffer(pipeline, :sink, %Buffer{payload: "from_b"})
+
+    Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "still_a"}})
+    assert_receive {:udp, ^probe_a, @localhostv4, _from, "still_a"}, 2000
+    refute_receive {:udp, ^probe_b, _, _, "still_a"}, 100
+
+    Pipeline.terminate(pipeline)
+  end
+
+  test "latch?: true makes the destination follow the most recent inbound packet" do
+    endpoint_port = 6320
+    port_a = 6321
+    port_b = 6322
+    port_c = 6323
+
+    {:ok, probe_a} = :gen_udp.open(port_a, [:binary, ip: @localhostv4, active: true])
+    {:ok, probe_b} = :gen_udp.open(port_b, [:binary, ip: @localhostv4, active: true])
+    {:ok, probe_c} = :gen_udp.open(port_c, [:binary, ip: @localhostv4, active: true])
+
+    on_exit(fn ->
+      :gen_udp.close(probe_a)
+      :gen_udp.close(probe_b)
+      :gen_udp.close(probe_c)
+    end)
+
+    pipeline =
+      Pipeline.start_link_supervised!(
+        spec:
+          child(:source, PushSource)
+          |> child(:udp, %UDP.Endpoint{
+            local_port_no: endpoint_port,
+            local_address: @localhostv4,
+            destination_port_no: port_a,
+            destination_address: @localhostv4,
+            latch?: true
+          })
+          |> child(:sink, %Testing.Sink{})
+      )
+
+    assert_pipeline_notified(pipeline, :udp, {:connection_info, _addr, _port})
+
+    Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "to_a"}})
+    assert_receive {:udp, ^probe_a, @localhostv4, _from, "to_a"}, 2000
+
+    :gen_udp.send(probe_b, @localhostv4, endpoint_port, "from_b")
+    assert_sink_buffer(pipeline, :sink, %Buffer{payload: "from_b"})
+
+    Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "to_b"}})
+    assert_receive {:udp, ^probe_b, @localhostv4, _from, "to_b"}, 2000
+    refute_receive {:udp, ^probe_a, _, _, "to_b"}, 100
+
+    :gen_udp.send(probe_c, @localhostv4, endpoint_port, "from_c")
+    assert_sink_buffer(pipeline, :sink, %Buffer{payload: "from_c"})
+
+    Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "to_c"}})
+    assert_receive {:udp, ^probe_c, @localhostv4, _from, "to_c"}, 2000
+    refute_receive {:udp, ^probe_a, _, _, "to_c"}, 100
+    refute_receive {:udp, ^probe_b, _, _, "to_c"}, 100
+
+    Pipeline.terminate(pipeline)
+  end
+
   test "NAT pierce datagram comes through" do
     {:ok, server_sock} =
       UDP.Socket.open(%UDP.Socket{port_no: @server_port, ip_address: @localhostv4})
