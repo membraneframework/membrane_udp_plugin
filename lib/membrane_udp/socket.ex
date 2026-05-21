@@ -1,6 +1,8 @@
 defmodule Membrane.UDP.Socket do
   @moduledoc false
 
+  use Bunch.Access
+
   @enforce_keys [:port_no, :ip_address]
   defstruct [:port_no, :ip_address, :socket_handle, sock_opts: []]
 

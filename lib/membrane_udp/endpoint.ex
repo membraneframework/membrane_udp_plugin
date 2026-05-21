@@ -6,11 +6,6 @@ defmodule Membrane.UDP.Endpoint do
   The destination can be changed at runtime by sending a parent notification:
 
       {:notify_child, {:endpoint, {:set_destination, {1, 2, 3, 4}, 5000}}}
-
-  This is useful for symmetric-RTP latching: a pipeline can read the source
-  address from an incoming buffer's `:udp_source_address`/`:udp_source_port`
-  metadata and redirect subsequent outbound packets to that peer so replies
-  traverse NAT correctly.
   """
   use Membrane.Endpoint, flow_control_hints?: false
 
@@ -101,8 +96,8 @@ defmodule Membrane.UDP.Endpoint do
 
     state =
       state
-      |> put_in([:dst_socket, Access.key!(:ip_address)], ip)
-      |> put_in([:dst_socket, Access.key!(:port_no)], port)
+      |> put_in([:dst_socket, :ip_address], ip)
+      |> put_in([:dst_socket, :port_no], port)
 
     {[], state}
   end

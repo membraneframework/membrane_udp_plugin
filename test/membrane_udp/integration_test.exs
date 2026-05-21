@@ -118,6 +118,11 @@ defmodule Membrane.UDP.IntegrationTest do
       {:ok, probe_new} =
         :gen_udp.open(new_port, [:binary, ip: @localhostv4, active: true])
 
+      on_exit(fn ->
+        :gen_udp.close(probe_initial)
+        :gen_udp.close(probe_new)
+      end)
+
       udp_child =
         struct!(unquote(element), %{
           local_port_no: 0,
@@ -130,9 +135,9 @@ defmodule Membrane.UDP.IntegrationTest do
 
       spec =
         if unquote(element) == UDP.Endpoint do
-          [base_link |> child(:drop, %Testing.Sink{})]
+          base_link |> child(:fake_sink, %Membrane.Debug.Sink{})
         else
-          [base_link]
+          base_link
         end
 
       pipeline = Pipeline.start_link_supervised!(spec: spec)
@@ -150,8 +155,6 @@ defmodule Membrane.UDP.IntegrationTest do
       assert_receive {:udp, ^probe_new, @localhostv4, _from_port, "second"}, 2000
       refute_receive {:udp, ^probe_initial, _, _, "second"}, 100
 
-      :gen_udp.close(probe_initial)
-      :gen_udp.close(probe_new)
       Pipeline.terminate(pipeline)
     end
   end

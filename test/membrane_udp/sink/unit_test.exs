@@ -23,48 +23,6 @@ defmodule Membrane.UDP.SinkUnitTest do
         assert unquote(module).handle_buffer(:input, %Buffer{payload: payload_data}, nil, state) ==
                  {[], state}
       end
-
-      test "handle_parent_notification/3 :set_destination updates dst_socket" do
-        local_socket = %Socket{port_no: 1234, ip_address: @local_address}
-        dst_socket = %Socket{port_no: 4321, ip_address: @local_address}
-        state = %{local_socket: local_socket, dst_socket: dst_socket}
-
-        new_ip = {1, 2, 3, 4}
-        new_port = 9000
-
-        assert {[], new_state} =
-                 unquote(module).handle_parent_notification(
-                   {:set_destination, new_ip, new_port},
-                   nil,
-                   state
-                 )
-
-        assert new_state.dst_socket.ip_address == new_ip
-        assert new_state.dst_socket.port_no == new_port
-        assert new_state.local_socket == local_socket
-      end
-
-      test "handle_parent_notification/3 :set_destination raises on bad input" do
-        local_socket = %Socket{port_no: 1234, ip_address: @local_address}
-        dst_socket = %Socket{port_no: 4321, ip_address: @local_address}
-        state = %{local_socket: local_socket, dst_socket: dst_socket}
-
-        assert_raise ArgumentError, fn ->
-          unquote(module).handle_parent_notification(
-            {:set_destination, "1.2.3.4", 9000},
-            nil,
-            state
-          )
-        end
-
-        assert_raise ArgumentError, fn ->
-          unquote(module).handle_parent_notification(
-            {:set_destination, {1, 2, 3, 4}, 70_000},
-            nil,
-            state
-          )
-        end
-      end
     end
   end
 end

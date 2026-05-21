@@ -94,8 +94,8 @@ defmodule Membrane.UDP.Sink do
 
     state =
       state
-      |> put_in([:dst_socket, Access.key!(:ip_address)], ip)
-      |> put_in([:dst_socket, Access.key!(:port_no)], port)
+      |> put_in([:dst_socket, :ip_address], ip)
+      |> put_in([:dst_socket, :port_no], port)
 
     {[], state}
   end
