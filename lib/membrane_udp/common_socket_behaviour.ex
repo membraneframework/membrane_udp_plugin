@@ -49,4 +49,19 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
   defp close_socket(%Socket{} = local_socket) do
     Socket.close(local_socket)
   end
+
+  @spec validate_destination!(:inet.ip_address(), :inet.port_number()) :: :ok
+  def validate_destination!(ip, port) do
+    unless is_tuple(ip) and tuple_size(ip) in [4, 8] do
+      raise ArgumentError,
+            "expected an :inet.ip_address() tuple, got: #{inspect(ip)}"
+    end
+
+    unless is_integer(port) and port in 1..65_535 do
+      raise ArgumentError,
+            "expected a UDP port in 1..65535, got: #{inspect(port)}"
+    end
+
+    :ok
+  end
 end

@@ -1,6 +1,10 @@
 defmodule Membrane.UDP.Sink do
   @moduledoc """
   Element that sends buffers received on the input pad over a UDP socket.
+
+  The destination can be changed at runtime by sending a parent notification:
+
+      {:notify_child, {:sink, {:set_destination, {1, 2, 3, 4}, 5000}}}
   """
   use Membrane.Sink
 
@@ -82,6 +86,18 @@ defmodule Membrane.UDP.Sink do
       :ok -> {[], state}
       {:error, cause} -> raise "Error sending UDP packet, reason: #{inspect(cause)}"
     end
+  end
+
+  @impl true
+  def handle_parent_notification({:set_destination, ip, port}, _ctx, state) do
+    CommonSocketBehaviour.validate_destination!(ip, port)
+
+    state =
+      state
+      |> put_in([:dst_socket, Access.key!(:ip_address)], ip)
+      |> put_in([:dst_socket, Access.key!(:port_no)], port)
+
+    {[], state}
   end
 
   @impl true

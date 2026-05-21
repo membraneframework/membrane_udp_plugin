@@ -8,6 +8,26 @@ defmodule Membrane.UDP.IntegrationTest do
   alias Membrane.Testing.Pipeline
   alias Membrane.UDP
 
+  defmodule PushSource do
+    @moduledoc false
+    use Membrane.Source
+
+    def_output_pad :output, accepted_format: _any, flow_control: :push
+
+    @impl true
+    def handle_init(_ctx, _opts), do: {[], %{}}
+
+    @impl true
+    def handle_playing(_ctx, state) do
+      {[stream_format: {:output, %Membrane.RemoteStream{type: :packetized}}], state}
+    end
+
+    @impl true
+    def handle_parent_notification({:push, payload}, _ctx, state) do
+      {[buffer: {:output, %Membrane.Buffer{payload: payload}}], state}
+    end
+  end
+
   @target_port 5000
   @server_port 6789
   @localhostv4 {127, 0, 0, 1}
@@ -85,6 +105,55 @@ defmodule Membrane.UDP.IntegrationTest do
     end)
 
     Pipeline.terminate(pipeline)
+  end
+
+  for {element, base_port} <- [{UDP.Endpoint, 6100}, {UDP.Sink, 6200}] do
+    test ":set_destination at runtime redirects packets through #{inspect(element)}" do
+      initial_port = unquote(base_port) + 1
+      new_port = unquote(base_port) + 2
+
+      {:ok, probe_initial} =
+        :gen_udp.open(initial_port, [:binary, ip: @localhostv4, active: true])
+
+      {:ok, probe_new} =
+        :gen_udp.open(new_port, [:binary, ip: @localhostv4, active: true])
+
+      udp_child =
+        struct!(unquote(element), %{
+          local_port_no: 0,
+          local_address: @localhostv4,
+          destination_port_no: initial_port,
+          destination_address: @localhostv4
+        })
+
+      base_link = child(:source, PushSource) |> child(:udp, udp_child)
+
+      spec =
+        if unquote(element) == UDP.Endpoint do
+          [base_link |> child(:drop, %Testing.Sink{})]
+        else
+          [base_link]
+        end
+
+      pipeline = Pipeline.start_link_supervised!(spec: spec)
+
+      assert_pipeline_notified(pipeline, :udp, {:connection_info, _addr, _port})
+
+      Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "first"}})
+      assert_receive {:udp, ^probe_initial, @localhostv4, _from_port, "first"}, 2000
+
+      Pipeline.execute_actions(pipeline,
+        notify_child: {:udp, {:set_destination, @localhostv4, new_port}}
+      )
+
+      Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "second"}})
+      assert_receive {:udp, ^probe_new, @localhostv4, _from_port, "second"}, 2000
+      refute_receive {:udp, ^probe_initial, _, _, "second"}, 100
+
+      :gen_udp.close(probe_initial)
+      :gen_udp.close(probe_new)
+      Pipeline.terminate(pipeline)
+    end
   end
 
   test "NAT pierce datagram comes through" do
