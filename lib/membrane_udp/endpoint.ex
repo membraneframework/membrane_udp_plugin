@@ -14,11 +14,17 @@ defmodule Membrane.UDP.Endpoint do
 
   def_options destination_address: [
                 spec: :inet.ip_address(),
-                description: "An IP Address that the packets will be sent to."
+                description: """
+                An IP Address that the packets will be sent to.
+                Can be updated at runtime via the `:set_destination` parent notification.
+                """
               ],
               destination_port_no: [
                 spec: :inet.port_number(),
-                description: "A UDP port number of a target."
+                description: """
+                A UDP port number of a target.
+                Can be updated at runtime via the `:set_destination` parent notification.
+                """
               ],
               local_address: [
                 spec: :inet.socket_address(),
