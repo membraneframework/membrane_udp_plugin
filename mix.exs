@@ -1,7 +1,7 @@
 defmodule Membrane.UDP.MixProject do
   use Mix.Project
 
-  @version "0.14.2"
+  @version "0.14.3"
   @github_url "https://github.com/membraneframework/membrane_udp_plugin"
 
   def project do
