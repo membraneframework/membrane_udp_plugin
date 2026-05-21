@@ -7,7 +7,9 @@ defmodule Membrane.UDP.Endpoint do
   options; the destination can additionally be changed at runtime by returning
   a `:notify_child` action with a `t:set_destination_notification/0`:
 
-      {[notify_child: {:endpoint, {:set_destination, peer_ip, peer_port}}], state}
+  ```elixir
+  {[notify_child: {:endpoint, {:set_destination, peer_ip, peer_port}}], state}
+  ```
   """
   use Membrane.Endpoint, flow_control_hints?: false
 
