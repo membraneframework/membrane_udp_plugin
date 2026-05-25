@@ -5,7 +5,7 @@ defmodule Membrane.UDP.Endpoint do
 
   The local and destination addresses are provided at init via the element's
   options; the destination can additionally be changed at runtime by returning
-  a `:notify_child` action with a `t:set_destination_notification/0`:
+  a `:notify_child` action with a `t:set_destination_notification/0` from the parents callback:
 
   ```elixir
   {[notify_child: {:endpoint, {:set_destination, peer_ip, peer_port}}], state}
