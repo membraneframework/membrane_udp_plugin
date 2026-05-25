@@ -23,14 +23,14 @@ defmodule Membrane.UDP.Endpoint do
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
   @type set_destination_notification ::
-          {:set_destination, :inet.ip_address(), :inet.port_number()}
+          {:set_destination, :inet.ip_address(), CommonSocketBehaviour.destination_port()}
 
   def_options destination_address: [
                 spec: :inet.ip_address(),
                 description: "An IP Address that the packets will be sent to."
               ],
               destination_port_no: [
-                spec: :inet.port_number(),
+                spec: CommonSocketBehaviour.destination_port(),
                 description: "A UDP port number of a target."
               ],
               local_address: [
@@ -83,7 +83,7 @@ defmodule Membrane.UDP.Endpoint do
       local_port_no: local_port_no
     } = opts
 
-    CommonSocketBehaviour.validate_destination!(dst_address, dst_port_no)
+    :ok = CommonSocketBehaviour.validate_destination!(dst_address, dst_port_no)
 
     state = %{
       dst_socket: %Socket{
@@ -118,7 +118,7 @@ defmodule Membrane.UDP.Endpoint do
 
   @impl true
   def handle_parent_notification({:set_destination, ip, port}, _ctx, state) do
-    CommonSocketBehaviour.validate_destination!(ip, port)
+    :ok = CommonSocketBehaviour.validate_destination!(ip, port)
 
     state =
       state

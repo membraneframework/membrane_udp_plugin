@@ -5,6 +5,8 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
   alias Membrane.Element.CallbackContext
   alias Membrane.UDP.Socket
 
+  @type destination_port :: 1..65_535
+
   @spec handle_setup(
           context :: CallbackContext.t(),
           state :: Element.state()
@@ -50,7 +52,7 @@ defmodule Membrane.UDP.CommonSocketBehaviour do
     Socket.close(local_socket)
   end
 
-  @spec validate_destination!(:inet.ip_address(), :inet.port_number()) :: :ok
+  @spec validate_destination!(:inet.ip_address(), destination_port()) :: :ok
   def validate_destination!(ip, port) do
     unless is_tuple(ip) and tuple_size(ip) in [4, 8] do
       raise ArgumentError,

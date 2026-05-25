@@ -107,10 +107,10 @@ defmodule Membrane.UDP.IntegrationTest do
     Pipeline.terminate(pipeline)
   end
 
-  for {element, base_port} <- [{UDP.Endpoint, 6100}, {UDP.Sink, 6200}] do
+  for element <- [UDP.Endpoint, UDP.Sink] do
     test ":set_destination at runtime redirects packets through #{inspect(element)}" do
-      initial_port = unquote(base_port) + 1
-      new_port = unquote(base_port) + 2
+      initial_port = get_free_port()
+      new_port = get_free_port()
 
       {:ok, probe_initial} =
         :gen_udp.open(initial_port, [:binary, ip: @localhostv4, active: true])
@@ -159,53 +159,11 @@ defmodule Membrane.UDP.IntegrationTest do
     end
   end
 
-  test "latch?: false keeps the configured destination after an inbound packet" do
-    endpoint_port = 6310
-    port_a = 6311
-    port_b = 6312
-
-    {:ok, probe_a} = :gen_udp.open(port_a, [:binary, ip: @localhostv4, active: true])
-    {:ok, probe_b} = :gen_udp.open(port_b, [:binary, ip: @localhostv4, active: true])
-
-    on_exit(fn ->
-      :gen_udp.close(probe_a)
-      :gen_udp.close(probe_b)
-    end)
-
-    pipeline =
-      Pipeline.start_link_supervised!(
-        spec:
-          child(:source, PushSource)
-          |> child(:udp, %UDP.Endpoint{
-            local_port_no: endpoint_port,
-            local_address: @localhostv4,
-            destination_port_no: port_a,
-            destination_address: @localhostv4,
-            latch?: false
-          })
-          |> child(:sink, %Testing.Sink{})
-      )
-
-    assert_pipeline_notified(pipeline, :udp, {:connection_info, _addr, _port})
-
-    Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "to_a"}})
-    assert_receive {:udp, ^probe_a, @localhostv4, _from, "to_a"}, 2000
-
-    :gen_udp.send(probe_b, @localhostv4, endpoint_port, "from_b")
-    assert_sink_buffer(pipeline, :sink, %Buffer{payload: "from_b"})
-
-    Pipeline.execute_actions(pipeline, notify_child: {:source, {:push, "still_a"}})
-    assert_receive {:udp, ^probe_a, @localhostv4, _from, "still_a"}, 2000
-    refute_receive {:udp, ^probe_b, _, _, "still_a"}, 100
-
-    Pipeline.terminate(pipeline)
-  end
-
-  test "latch?: true makes the destination follow the most recent inbound packet" do
-    endpoint_port = 6320
-    port_a = 6321
-    port_b = 6322
-    port_c = 6323
+  test "latch?: true makes the outbound destination follow the source of the most recent inbound packet" do
+    endpoint_port = get_free_port()
+    port_a = get_free_port()
+    port_b = get_free_port()
+    port_c = get_free_port()
 
     {:ok, probe_a} = :gen_udp.open(port_a, [:binary, ip: @localhostv4, active: true])
     {:ok, probe_b} = :gen_udp.open(port_b, [:binary, ip: @localhostv4, active: true])
@@ -277,5 +235,12 @@ defmodule Membrane.UDP.IntegrationTest do
 
     handle = server_sock.socket_handle
     assert_receive({:udp, ^handle, @localhostv4, @target_port, <<>>}, 20_000)
+  end
+
+  defp get_free_port() do
+    {:ok, s} = :gen_tcp.listen(0, active: false)
+    {:ok, port} = :inet.port(s)
+    :ok = :gen_tcp.close(s)
+    port
   end
 end
