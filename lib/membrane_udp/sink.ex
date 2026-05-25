@@ -15,15 +15,17 @@ defmodule Membrane.UDP.Sink do
   alias Membrane.Buffer
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
+  @type destination_port :: 1..65_535
+
   @type set_destination_notification ::
-          {:set_destination, :inet.ip_address(), CommonSocketBehaviour.destination_port()}
+          {:set_destination, :inet.ip_address(), destination_port()}
 
   def_options destination_address: [
                 spec: :inet.ip_address(),
                 description: "An IP Address that the packets will be sent to."
               ],
               destination_port_no: [
-                spec: CommonSocketBehaviour.destination_port(),
+                spec: destination_port(),
                 description: "A UDP port number of a target."
               ],
               local_address: [
