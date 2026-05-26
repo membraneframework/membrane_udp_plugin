@@ -14,7 +14,7 @@ defmodule Membrane.UDP.SinkIntegrationTest do
     dst_socket = %Socket{port_no: @destination_port_no, ip_address: @local_address}
     local_socket = %Socket{port_no: @local_port_no, ip_address: @local_address}
 
-    %{state: %{dst_socket: dst_socket, local_socket: local_socket}}
+    %{state: %{dst_socket: dst_socket, local_socket: local_socket, latch?: false}}
   end
 
   setup [:setup_state, :setup_socket_from_state]

@@ -19,6 +19,8 @@ defmodule Membrane.UDP.Endpoint do
   """
   use Membrane.Endpoint, flow_control_hints?: false
 
+  require Membrane.Logger
+
   alias Membrane.{Buffer, RemoteStream}
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
@@ -122,6 +124,13 @@ defmodule Membrane.UDP.Endpoint do
   def handle_parent_notification({:set_destination, ip, port}, _ctx, state) do
     :ok = CommonSocketBehaviour.validate_destination!(ip, port)
 
+    if state.latch? do
+      Membrane.Logger.warning("""
+      #{inspect({:set_destination, ip, port})}} received while :latch? option was set to true;
+      the next inbound packet might overwrite this destination"
+      """)
+    end
+
     state =
       state
       |> put_in([:dst_socket, :ip_address], ip)
@@ -145,22 +154,27 @@ defmodule Membrane.UDP.Endpoint do
         %{playback: :playing},
         state
       ) do
-    metadata =
-      Map.new()
-      |> Map.put(:udp_source_address, address)
-      |> Map.put(:udp_source_port, port_no)
-      |> Map.put(:arrival_ts, Membrane.Time.vm_time())
-
-    actions = [buffer: {:output, %Buffer{payload: payload, metadata: metadata}}]
-
     state =
-      if state.latch? do
+      if state.latch? and
+           (state.dst_socket.ip_address != address or state.dst_socket.port_no != port_no) do
+        Membrane.Logger.debug(
+          "latch: outbound destination updated to #{:inet.ntoa(address)}:#{port_no}"
+        )
+
         state
         |> put_in([:dst_socket, :ip_address], address)
         |> put_in([:dst_socket, :port_no], port_no)
       else
         state
       end
+
+    metadata = %{
+      udp_source_address: address,
+      udp_source_port: port_no,
+      arrival_ts: Membrane.Time.vm_time()
+    }
+
+    actions = [buffer: {:output, %Buffer{payload: payload, metadata: metadata}}]
 
     {actions, state}
   end
