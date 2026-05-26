@@ -14,14 +14,15 @@ defmodule Membrane.UDP.SinkIntegrationTest do
     dst_socket = %Socket{port_no: @destination_port_no, ip_address: @local_address}
     local_socket = %Socket{port_no: @local_port_no, ip_address: @local_address}
 
-    %{state: %{dst_socket: dst_socket, local_socket: local_socket, latch?: false}}
+    %{state: %{dst_socket: dst_socket, local_socket: local_socket}}
   end
 
   setup [:setup_state, :setup_socket_from_state]
 
-  for module <- [Endpoint, Sink] do
+  for {module, extra_state} <- [{Endpoint, %{latch?: false}}, {Sink, %{}}] do
     @tag open_socket_from_state: [:dst_socket, :local_socket]
     test "Sends udp packet through #{inspect(module)}", %{state: state} do
+      state = Map.merge(state, unquote(Macro.escape(extra_state)))
       payload = "A lot of laughs"
 
       unquote(module).handle_buffer(:input, %Buffer{payload: payload}, nil, state)
@@ -32,6 +33,7 @@ defmodule Membrane.UDP.SinkIntegrationTest do
     @tag open_socket_from_state: [:dst_socket, :local_socket]
     test ":set_destination redirects packets to the new port via #{inspect(module)}",
          %{state: state} do
+      state = Map.merge(state, unquote(Macro.escape(extra_state)))
       alt_port = @destination_port_no + 100
 
       alt_socket =
