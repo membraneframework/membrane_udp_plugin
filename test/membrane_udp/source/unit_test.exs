@@ -3,12 +3,12 @@ defmodule Membrane.UDP.SourceTest do
 
   alias Membrane.UDP.{Endpoint, Source}
 
-  for module <- [Endpoint, Source] do
+  for {module, state_fixture} <- [{Endpoint, %{latch?: false}}, {Source, %{}}] do
     test "parses udp message #{inspect(module)} element" do
       example_binary_payload = "Hi there, I am binary"
       sender_port = 6666
       sender_address = {192, 168, 0, 1}
-      state = :unchanged
+      state = unquote(Macro.escape(state_fixture))
       message = {:udp, 5000, sender_address, sender_port, example_binary_payload}
 
       assert {actions, ^state} =

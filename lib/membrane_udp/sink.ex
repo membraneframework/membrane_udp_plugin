@@ -1,18 +1,31 @@
 defmodule Membrane.UDP.Sink do
   @moduledoc """
   Element that sends buffers received on the input pad over a UDP socket.
+
+  The local and destination addresses are provided at init via the element's
+  options; the destination can additionally be changed at runtime by returning
+  a `:notify_child` action with a `t:set_destination_notification/0`:
+
+  ```elixir
+  {[notify_child: {:sink, {:set_destination, peer_ip, peer_port}}], state}
+  ```
   """
   use Membrane.Sink
 
   alias Membrane.Buffer
   alias Membrane.UDP.{CommonSocketBehaviour, Socket}
 
+  @type destination_port :: 1..65_535
+
+  @type set_destination_notification ::
+          {:set_destination, :inet.ip_address(), destination_port()}
+
   def_options destination_address: [
                 spec: :inet.ip_address(),
                 description: "An IP Address that the packets will be sent to."
               ],
               destination_port_no: [
-                spec: :inet.port_number(),
+                spec: destination_port(),
                 description: "A UDP port number of a target."
               ],
               local_address: [
@@ -54,6 +67,8 @@ defmodule Membrane.UDP.Sink do
       local_socket: local_socket
     } = options
 
+    :ok = CommonSocketBehaviour.validate_destination!(dst_address, dst_port_no)
+
     state = %{
       dst_socket: %Socket{
         ip_address: dst_address,
@@ -82,6 +97,18 @@ defmodule Membrane.UDP.Sink do
       :ok -> {[], state}
       {:error, cause} -> raise "Error sending UDP packet, reason: #{inspect(cause)}"
     end
+  end
+
+  @impl true
+  def handle_parent_notification({:set_destination, ip, port}, _ctx, state) do
+    :ok = CommonSocketBehaviour.validate_destination!(ip, port)
+
+    state =
+      state
+      |> put_in([:dst_socket, :ip_address], ip)
+      |> put_in([:dst_socket, :port_no], port)
+
+    {[], state}
   end
 
   @impl true
