@@ -55,7 +55,7 @@ defmodule Membrane.UDP.MixProject do
     [
       {:membrane_core, "~> 1.0"},
       {:mimic, "~> 1.7", only: :test},
-      {:ex_doc, "~> 0.40", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.40.0", only: :dev, runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:credo, ">= 0.0.0", only: :dev, runtime: false}
     ]
