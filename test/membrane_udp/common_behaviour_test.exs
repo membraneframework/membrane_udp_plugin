@@ -16,7 +16,7 @@ defmodule Membrane.UDP.CommonBehaviourTest do
 
     test "validate_destination! rejects non-tuple ip" do
       assert_raise ArgumentError, ~r/ip_address/, fn ->
-        CommonSocketBehaviour.validate_destination!("127.0.0.1", 5000)
+        validate_destination!("127.0.0.1", 5000)
       end
     end
 
@@ -36,7 +36,7 @@ defmodule Membrane.UDP.CommonBehaviourTest do
       end
 
       assert_raise ArgumentError, ~r/UDP port/, fn ->
-        CommonSocketBehaviour.validate_destination!({127, 0, 0, 1}, :not_a_port)
+        validate_destination!({127, 0, 0, 1}, :not_a_port)
       end
     end
 
@@ -65,5 +65,11 @@ defmodule Membrane.UDP.CommonBehaviourTest do
 
       close_socket.()
     end
+  end
+
+  # apply/3 hides argument types from the type checker
+  defp validate_destination!(ip, port) do
+    args = [ip, port]
+    apply(CommonSocketBehaviour, :validate_destination!, args)
   end
 end
