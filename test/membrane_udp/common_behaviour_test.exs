@@ -67,6 +67,7 @@ defmodule Membrane.UDP.CommonBehaviourTest do
     end
   end
 
+  # apply/3 hides argument types from the type checker
   defp validate_destination!(ip, port) do
     args = [ip, port]
     apply(CommonSocketBehaviour, :validate_destination!, args)
